@@ -373,7 +373,7 @@ code {
                 <div class=" sidebar-item sidebar-menu">
                     <ul>
                         <li class="header-menu">
-                            <span>UMAP</span>
+                            <span>Change UMAP Coordinates</span>
                         </li>
                         <li class="sidebar-dropdown">
                             <a href="#">
@@ -406,6 +406,15 @@ code {
                                     </li> -->
                                 </ul>
                             </div>
+                        </li>
+                        <li class="header-menu">
+                            <span>Graphs</span>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa-solid fa-location-pin"></i>
+                                <span class="menu-text" data-toggle="collapse" data-target="#container_panel_sclncrna_expression_violin" aria-expanded="false" aria-controls="container_panel_datatable_cell_marker">Violin Plot</span>
+                            </a>
                         </li>
                         <li class="header-menu">
                             <span>Data Table</span>
@@ -705,7 +714,7 @@ code {
                             <div class="btn-toolbar" role="toolbar">
                                 <div class="input-group">
                                     <div class="form-check form-check-inline">
-                                        <input id="checkbox__plotly_sclncrna_expression_violine__ignore_cells_with_zero_counts" type="checkbox" checked data-toggle="toggle" data-on="All Cells" data-off="Only Positive Cells" data-onstyle="light" data-offstyle="secondary" data-size="sm" data-style="ios" data-width="150" onchange="UpdateGene( )">
+                                        <input id="checkbox__plotly_sclncrna_expression_violin__ignore_cells_with_zero_counts" type="checkbox" checked data-toggle="toggle" data-on="All Cells" data-off="Only Positive Cells" data-onstyle="light" data-offstyle="secondary" data-size="sm" data-style="ios" data-width="150" onchange="UpdateGene( )">
                                     </div>
                                 </div>
                             </div>
@@ -730,12 +739,10 @@ code {
             </div>
         </div>
     </div>
-    <div>
-        <div id="plotly_sclncrna_expression_violine"></div>
-    </div>
     <nav class="navbar navbar-dark bg-custom-navbar">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent_supplementary_graph_setting_panel" aria-controls="navbarToggleExternalContent_supplementary_graph_setting_panel" aria-expanded="false" aria-label="Toggle supplementary plot setting panel" data-tooltip="tooltip" data-placement="right" data-html="true" title="Press to <b>select or remove columns</b> in for <i>parallel coordinate graphs</i> for filtering cross-reactivity prediction data"><i class="material-icons icon-white" style="font-size:20px;cursor:pointer">settings</i></button>
         <form class="form-inline">
+			<button class="btn btn-light btn-sm mx-1 my-0" id="btn_violin_plot" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_sclncrna_expression_violin" aria-expanded="false" aria-controls="container_panel_sclncrna_expression_violin" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a collection of violin plots</i> displaying a distribution of gene expression values for each cell cluster" aria-label="">Violin Plot</button>
             <button class="btn btn-light btn-sm mx-1 my-0" id="btn_cell_marker_table" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_datatable_cell_marker" aria-expanded="false" aria-controls="container_panel_datatable_cell_marker" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a data table</i> displaying <b>cell markers</b> for a given cell cluster" aria-label="">Cell Marker Table</button>
             <button class="btn btn-light btn-sm mx-1 my-0" id="btn_correl_gene_table" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_datatable_correl" aria-expanded="false" aria-controls="container_panel_datatable_correl" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a data table</i> displaying a list of genes <b>whose expression is correlated with the current gene</b>" aria-label="">Co-expressed Gene Table</button>
 <!--             <button class="btn btn-light btn-sm mx-1 my-0" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_interaction_network" aria-expanded="false" aria-controls="container_interaction_network"data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a table</i> showing <b>predicted/experimental structural properties</b> of aligned query and SARS-CoV-2 target proteins" aria-label="">Interactions</button> -->
@@ -745,6 +752,9 @@ code {
         <div class="bg-custom-navbar-hidden p-4">
             <h4 class="text-black">Supplementary Graph Setting Panel</h4>
         </div>
+    </div>
+    <div id="container_panel_sclncrna_expression_violin" class="collapse">
+        <div id="plotly_sclncrna_expression_violin"></div>
     </div>
     <div id="container_panel_datatable_cell_marker" class="collapse">
         <nav class="navbar navbar-dark bg-custom-navbar">
@@ -921,7 +931,7 @@ code {
                             </div> -->
                         </div>
                         <div class="carousel-item">
-                            <img src="https://gist-fgl.github.io/sc-caf-atlas/img/website3_compressed.jpg" class="d-block w-100 mx-auto" style="max-width: 600px; max-height: 900px !important;" alt="broad cell types">
+                            <img src="https://gist-fgl.github.io/sc-caf-atlas/img/website3_compressed.jpg" class="d-block w-100 mx-auto" style="max-width: 700px; max-height: 900px !important;" alt="broad cell types">
 <!--                             <div class="carousel-caption d-none d-md-block">
                                 <h2>Filter cross-reactive immune epitopes</h2>
                                 <p>Multiple filters can be applied.<br>To remove a filter, click the filter again</p>
@@ -1999,7 +2009,7 @@ var DragSort=function(t){
     var plotPreviewGene = document.getElementById( "plotly_searchbox_main_preview" ),
         plotSingleCellAnnotation = document.getElementById( "plotly_sclncrna_expression_umap_annotation" ),
         plotSingleCellExpression = document.getElementById( "plotly_sclncrna_expression_umap_expression" ),
-        plotSingleCellExpressionViolin = document.getElementById( "plotly_sclncrna_expression_violine" );
+        plotSingleCellExpressionViolin = document.getElementById( "plotly_sclncrna_expression_violin" );
     object_data.setting.plot.single_cell_scatter = { 
         max_height: 750,
         marker_size: 1,
@@ -2190,7 +2200,7 @@ var DragSort=function(t){
 //         LoadRemoteTextFile( "http://www.rna-society.org/rnainter/php_mysql/api.php?keyword=Actb&species=Mus musculus" )
         
         // Violin plots
-        object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts = ! document.getElementById( "checkbox__plotly_sclncrna_expression_violine__ignore_cells_with_zero_counts" ).checked; // retrieve current setting
+        object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts = ! document.getElementById( "checkbox__plotly_sclncrna_expression_violin__ignore_cells_with_zero_counts" ).checked; // retrieve current setting
         
         // retrieve str_name_data_annotation from the current setting
         let str_name_data_annotation = Select_Get_Selected_Option_Using_ID( "select_umap_annotation_data" ).value;
