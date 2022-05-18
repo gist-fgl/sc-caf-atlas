@@ -624,12 +624,12 @@ code {
                 </li>
                 <li class="nav-item">
                     <select class="custom-select w-auto mx-2 my-0" id="select_dataset" title="select dataset" onchange="Load_Dataset( )">
+                        <option value="fibroblast">104,692 cells (fibroblasts only)</option>
                         <option value="all">838,388 cells (full dataset)</option>
                         <option value="10000cells_per_cluster">290,523 cells (1/3 subsampled)</option>
                         <option value="5000cells_per_cluster">158,943 cells (1/5 subsampled)</option>
                         <option value="2000cells_per_cluster" selected>66,741 cells (1/12 subsampled)</option>
                         <option value="1000cells_per_cluster">34,647 cells (1/25 subsampled)</option>
-                        <option value="fibroblast"> (fibroblasts only)</option>
                     </select>
                 </li>
             </ul>
@@ -660,9 +660,8 @@ code {
                         <div class="input-group-prepend mx-2 my-0" style="height:30px"><h5 id="text_umap_annotation" class="input-group-text">Annotation</h5></div>
                         <select class="form-control my-0" id="select_umap_annotation_data" style="text-align: center; height:30px; line-height: 0px; padding-top: 0px; padding-bottom: 0px;" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Select data to be visualized on the 'Annotation' UMAP plot" onchange="ChangeAnnotation( )">
                             <option value="name_cluster" selected>Cluster</option>
+                            <option value="cell_anno_detailed">Cell Type (Detailed)</option>
                             <option value="cell_type">Cell Type (Basic)</option>
-                            <option value="cell_anno_detailed">Detailed Annotation</option>
-                            <option value="cell_anno_abbreviation">Abbrev.</option>
                             <option value="tissue">Tissue</option>
                             <option value="nCount_RNA">Number of mRNA</option>
                             <option value="nFeature_RNA">Number of Genes</option>
@@ -982,7 +981,7 @@ var DragSort=function(t){
     var e,i=0,s={},r={},a=(e=window.MutationObserver||window.WebKitMutationObserver,function(t,i){t&&1===t.nodeType&&(e?new e((function(t,e){i(t)})).observe(t,{childList:!0,subtree:!1}):window.addEventListener&&t.addEventListener("DOMNodeInserted",i,!1))});function n(t,e){if(!t)return this;e=e||{},this.parentElm=t,this.uid=e.uid,this.settings={selector:"*",callbacks:{}},Object.assign(this.settings,e),this.setup(),a(this.parentElm,this.setup.bind(this)),this.bindEvents()}return n.prototype={namespace:"dragsort",setup(){[...this.parentElm.childNodes].forEach(t=>{if(1!=t.nodeType)return t.parentNode.removeChild(t);t.matches(this.settings.selector)&&(t.draggable=!0)}),this.gap=this.getItemsGap(this.parentElm.firstElementChild)},throttle(t,e){var i=!1,s=this;return function(r){i||(t.call(s,r),i=!0,setTimeout(()=>i=!1,e))}},getDraggableElm(t){var e=t.closest('[draggable="true"]');return this.uid==s.uid?e:null},dragstart(t,e){s=this;var i,r=this.getDraggableElm(e);r?(this.source=this.getInitialState(),this.target=this.getInitialState(),i=r.getBoundingClientRect(),this.source.elm=r,this.source.idx=this.getNodeIndex(r),this.source.size.width=i.width,this.source.size.height=i.height,t.dataTransfer.effectAllowed="move",setTimeout(this.afterDragStart.bind(this))):s={}},afterDragStart(){var t="vertical"==this.settings.mode?"height":"width";this.parentElm.classList.add(this.namespace+"--dragStart"),this.source.elm.style[t]=this.source.size[t]+"px",this.source.elm.classList.add(this.namespace+"--dragElem")},dragover(t){t.preventDefault(),t.stopPropagation();var e=t.target;if((e=this.getDraggableElm(e))&&this.target){var i=this.target.elm,s=this.target.hoverDirection;t.dataTransfer.dropEffect="move",this.target.hoverDirection=this.getTargetDirection(t),i==e&&s==this.target.hoverDirection||this.directionAwareDragEnter(t,e)}},dragenter(t,e){(e=this.getDraggableElm(e))&&this.target&&this.isValidElm(e)&&this.source.elm!=e&&this.source.elm&&(this.target.bounding=e.getBoundingClientRect())},directionAwareDragEnter(t,e){var i;t.preventDefault(),t.stopPropagation(),t.dataTransfer.dropEffect="none",this.isValidElm(e)&&this.source.elm!=e&&this.source.elm&&(t.dataTransfer.dropEffect="move",this.cleanupLastTarget(),this.target.elm=e,this.target.idx=this.getNodeIndex(e),e.classList.add("over"),i=Math.abs(this.target.idx-this.source.idx),this.source.elm.classList.toggle(this.namespace+"--hide",i>0),"vertical"==this.settings.mode?this.target.elm.style[this.target.hoverDirection?"marginBottom":"marginTop"]=this.source.size.height+this.gap+"px":this.target.elm.style[this.target.hoverDirection?"marginRight":"marginLeft"]=this.source.size.width+this.gap+"px")},dragend(t){if(clearTimeout(this.dragoverTimeout),this.dragoverTimeout=null,this.parentElm.classList.remove(this.namespace+"--dragStart"),!this.isValidElm(this.target.elm))return this.cleanup();var e=this.target.hoverDirection?this.target.elm.nextElementSibling:this.target.elm;return this.source.elm!=this.target.elm&&this.target.elm&&(this.target.elm.classList.add(this.namespace+"--noAnim"),this.cleanup(),this.parentElm.insertBefore(this.source.elm,e)),this.source.elm&&this.source.elm.classList.remove(this.namespace+"--dragElem",this.namespace+"--hide"),this.settings.callbacks.dragEnd(this.source.elm),this},isTargetLastChild(){return this.parentElm.lastElementChild==this.target.elm},getTargetDirection(t){if(this.target.bounding)return"vertical"==this.settings.mode?t.pageY>this.target.bounding.top+this.target.bounding.height/2?1:0:t.pageX>this.target.bounding.left+this.target.bounding.width/2?1:0},getNodeIndex(t){for(var e=0;t=t.previousSibling;)3==t.nodeType&&/^\s*$/.test(t.data)||e++;return e},isValidElm(t){return t&&t.nodeType&&t.parentNode==this.parentElm},cleanup(){s={},[...this.parentElm.children].forEach(t=>{t.removeAttribute("style"),setTimeout(()=>{t.classList.remove(this.namespace+"--over",this.namespace+"--noAnim",this.namespace+"--dragElem")},50)})},cleanupLastTarget(){this.target.elm&&(this.target.elm.classList.remove(this.namespace+"--hide",this.namespace+"--over"),this.target.elm.removeAttribute("style"))},getInitialState:()=>({elm:null,size:{}}),getItemsGap(t){var e=getComputedStyle(t);return"vertical"==this.settings.mode?parseInt(e.marginTop)+parseInt(e.marginBottom):parseInt(e.marginLeft)+parseInt(e.marginRight)},bindEvents(t){for(var e in this.listeners=this.listeners||{dragstart:t=>this.dragstart(t,t.target),dragenter:t=>this.dragenter(t,t.target),dragend:t=>this.dragend(t,t.target),dragover:this.throttle(this.dragover,350)},this.listeners)this.parentElm[t?"removeEventListener":"addEventListener"](e,this.listeners[e])},destroy(){this.cleanup(),this.bindEvents(!0),delete r[this.uid]}},function(t,e){return r[++i]=t._DragSort?r[t._DragSort]:new n(t,{...e,uid:i}),t._DragSort=i,r[i]}}();
 
 // Initialization
-    var name_application = "Single_Cell_LncRNA_Database"; // define name of the application
+    var name_application = "Single_Cell_CAF_Atlas"; // define name of the application
     $(document).ready( function( ) {
         $('[data-toggle="tooltip"]').tooltip( ); // enable tooltips
         $('[data-tooltip="tooltip"]').tooltip( );
@@ -1052,6 +1051,11 @@ var DragSort=function(t){
 // load packages
     // use dataframe-js
     var DataFrame = dfjs.DataFrame;
+    
+// for argsort
+    let decor = (v, i) => [v, i];          // set index to value
+    let undecor = a => a[1];               // leave only index
+    let argsort = arr => arr.map(decor).sort().map(undecor);
     
 // key interactions
     object_data_keydown = { dict_status: { } };
@@ -2091,6 +2095,7 @@ var DragSort=function(t){
     
         let dictarr = object_data.main.umap.dictarr,
             l_expr = object_data.main.gene.expr.data[ gene_symbol ].data,
+            argsort_l_expr = argsort( l_expr ), // retrieve argsort for l_expr data
             col_name_cell_type = 'cell_type';
         if ( ! object_data.main.umap.flag_all_tissues ) {
             l_expr = ArrayBooleanIndexing( l_expr, object_data.main.umap.l_bool_index_tissue );
@@ -2126,20 +2131,21 @@ var DragSort=function(t){
         $id( 'select_scatter_y_axis' ).disabled = false; 
         object_data.setting.plot.single_cell_scatter.int_factor_axis_range_to_marker_size = object_data.main.scatter.flag_axis_using_gene_expr ? 7 : 30;
         object_data.setting.plot.single_cell_scatter.marker_size = ResponsiveMarkerSize( plotSingleCellAnnotation, object_data.setting.plot.single_cell_scatter.int_factor_axis_range_to_marker_size, object_data.setting.plot.single_cell_scatter.int_factor_marker_size_multiply );
-        if ( flag_restyle ) { // restyle existing plot
+        if ( false ) { // restyle existing plot // currently, to put cells with higher expression on top of cells with low expression, restyling is disabled.
             console.log( "[UpdateGene] restyling existing plot for", gene_symbol );
             let update = { 
                 hovertemplate: ["Expression of <b>" + gene_symbol + "</b>: <b>%{marker.color:.3f}</b>",
                                 "cluster: <b>%{customdata[0]}</b>",
-                                "cell type: <b>%{customdata[2]}</b>",
+                                "cell type (detailed): <b>%{customdata[3]}</b>",
+                                "cell type (simple): <b>%{customdata[2]}</b>",
                                 "tissue: <b>%{customdata[1]}</b>",
                                 "",
                                 object_data.main.scatter.x_label + ": <b>%{x:.2f}</b>",
                                 object_data.main.scatter.y_label + ": <b>%{y:.2f}</b>",
-                                "%{customdata[3]}",
+                                "%{customdata[4]}",
                                 "<extra></extra>" ].join( "<br>" ),
                 marker: { 
-                    color: l_expr,
+                    color: ArrayIndexing( l_expr, argsort_l_expr ),
                     showscale: true,
                     colorscale: "YlOrRd",
                     reversescale: true,
@@ -2151,24 +2157,26 @@ var DragSort=function(t){
             let trace = {
                 mode: 'markers',
                 type: 'scattergl',
-                x: dictarr[ object_data.main.scatter.x_axis_col_name ],
-                y: dictarr[ object_data.main.scatter.y_axis_col_name ],
-                customdata: ArrayTranspose( [ dictarr[ 'name_cluster' ],
-                                              dictarr[ "tissue" ],
-                                              dictarr[ "cell_type" ],
-                                              dictarr[ 'cell_barcode' ]
+                x: ArrayIndexing( dictarr[ object_data.main.scatter.x_axis_col_name ], argsort_l_expr ),
+                y: ArrayIndexing( dictarr[ object_data.main.scatter.y_axis_col_name ], argsort_l_expr ),
+                customdata: ArrayTranspose( [ ArrayIndexing( dictarr[ 'name_cluster' ], argsort_l_expr ),
+                                              ArrayIndexing( dictarr[ "tissue" ], argsort_l_expr ),
+                                              ArrayIndexing( dictarr[ "cell_type" ], argsort_l_expr ),
+                                              ArrayIndexing( dictarr[ "cell_anno_detailed" ], argsort_l_expr ),
+                                              ArrayIndexing( dictarr[ 'cell_barcode' ], argsort_l_expr )
                                             ] ),
                 hovertemplate: ["Expression of <b>" + gene_symbol + "</b>: <b>%{marker.color:.3f}</b>",
                                 "cluster: <b>%{customdata[0]}</b>",
-                                "cell type: <b>%{customdata[2]}</b>",
+                                "cell type (detailed): <b>%{customdata[3]}</b>",
+                                "cell type (simple): <b>%{customdata[2]}</b>",
                                 "tissue: <b>%{customdata[1]}</b>",
                                 "",
                                 object_data.main.scatter.x_label + ": <b>%{x:.2f}</b>",
                                 object_data.main.scatter.y_label + ": <b>%{y:.2f}</b>",
-                                "%{customdata[3]}",
+                                "%{customdata[4]}",
                                 "<extra></extra>" ].join( "<br>" ),
                 marker: { 
-                    color: l_expr,
+                    color: ArrayIndexing( l_expr, argsort_l_expr ),
                     showscale: true,
                     colorscale: "YlOrRd",
                     reversescale: true,
@@ -2186,6 +2194,11 @@ var DragSort=function(t){
             plotSingleCellExpression.on( 'plotly_click', async function( data ) {
                 PlotlyCallBackSingleCellMarker( data.points[ 0 ] ); // open single cell marker for the first data
             });
+            // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
+            let lay = plotSingleCellAnnotation.layout
+            if ( ! ( lay.xaxis.autorange && lay.yaxis.autorange ) ) { // only trigger relayout if there is an alteration of coordinates of 'plotSingleCellExpression'
+                Plotly.relayout( plotSingleCellExpression, { 'xaxis.range[0]': lay.xaxis.range[ 0 ], 'xaxis.range[1]': lay.xaxis.range[ 1 ], 'xaxis.autorange': lay.xaxis.autorange, 'yaxis.range[0]': lay.yaxis.range[ 0 ], 'yaxis.range[1]': lay.yaxis.range[ 1 ], 'yaxis.autorange': lay.yaxis.autorange } ); // perform relayout operation
+            }
         }
 //         // Update correlated genes 
         
@@ -2278,6 +2291,7 @@ var DragSort=function(t){
             l_color = [ ], marker_colormap = { }, str_hovertemplate_additional_line = '';
         // set color 
         switch( str_name_data_annotation ) {
+          case 'cell_anno_detailed' :
           case 'name_cluster':
           case 'cell_type':
           case 'gender':
@@ -2288,7 +2302,7 @@ var DragSort=function(t){
           case 'group':
             l_color = ArrayMap( dictarr[ str_name_data_annotation ], object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_color[ str_tissue ][ str_name_data_annotation ], '#A9A9A9' ); // default color is '#A9A9A9'
             break;
-          default:
+          default: // by default shows color based on continuous values
             l_color = dictarr[ str_name_data_annotation ];
             marker_colormap = { showscale: true, colorscale: "YlOrRd", reversescale: true }; // setting for showing colormap
             str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <b>%{marker.color:." + ( ( str_name_option_selected == 'MT Percentage' ) ? 1 : 0 ).toString( ) + "f}</b><br>"; // only MT percentage data will be shown as floating point numbers
@@ -2328,12 +2342,13 @@ var DragSort=function(t){
             console.log( "[PlotCellAnnotation] restyling existing plot for", str_name_data_annotation );
             let update = {
                 hovertemplate: [ str_hovertemplate_additional_line + "cluster: <b>%{customdata[0]}</b>",
-                                "cell type: <b>%{customdata[1]}</b>",
-                                "tissue: <b>%{customdata[2]}</b>",
+                                "cell type (detailed): <b>%{customdata[2]}</b>",
+                                "cell type (simple): <b>%{customdata[1]}</b>",
+                                "tissue: <b>%{customdata[3]}</b>",
                                 "",
                                 object_data.main.scatter.x_label + ": <b>%{x:.2f}</b>",
                                 object_data.main.scatter.y_label + ": <b>%{y:.2f}</b>",
-                                "%{customdata[3]}",
+                                "%{customdata[4]}",
                                 "<extra></extra>" ].join( "<br>" ),
                 marker: { 
                     color: l_color,
@@ -2350,16 +2365,18 @@ var DragSort=function(t){
                 y: dictarr[ object_data.main.scatter.y_axis_col_name ],
                 customdata: ArrayTranspose( [ dictarr[ 'name_cluster' ],
                                               dictarr[ 'cell_type' ],
+                                              dictarr[ 'cell_anno_detailed' ],
                                               dictarr[ "tissue" ],
                                               dictarr[ 'cell_barcode' ]
                                             ] ),
                 hovertemplate: [ str_hovertemplate_additional_line + "cluster: <b>%{customdata[0]}</b>",
-                                "cell type: <b>%{customdata[1]}</b>",
-                                "tissue: <b>%{customdata[2]}</b>",
+                                "cell type (detailed): <b>%{customdata[2]}</b>",
+                                "cell type (simple): <b>%{customdata[1]}</b>",
+                                "tissue: <b>%{customdata[3]}</b>",
                                 "",
                                 object_data.main.scatter.x_label + ": <b>%{x:.2f}</b>",
                                 object_data.main.scatter.y_label + ": <b>%{y:.2f}</b>",
-                                "%{customdata[3]}",
+                                "%{customdata[4]}",
                                 "<extra></extra>" ].join( "<br>" ),
                 marker: { 
                     color: l_color,
@@ -2506,7 +2523,7 @@ var DragSort=function(t){
         // load and initialize box plot data 
         if ( ! ( 'gene_summary' in object_data.main ) || str_name_data_annotation != object_data.main.gene_summary.str_name_data_annotation ) { // if box plot data has not been parsed or annotation data has been changed, initialize the data
             // update box plot data if the given 'str_name_data_annotation' is valid
-            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '' } ) {
+            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '' } ) {
                 let name_file_box_plot_summary = "box_precomputed.multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
                 await LoadRemoteData( [ object_data.file.base_url + name_file_box_plot_summary ] );
                 object_data.main.gene_summary = { };
