@@ -383,27 +383,34 @@ code {
                             <div class="sidebar-submenu">
                                 <ul>
                                     <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'All' )">All Cells<span class="badge badge-pill badge-primary">838,388 cells</span></a>
-                                    </li>
-<!--                                     <li>
-                                    <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'Heart' )">Heart<span class="badge badge-pill badge-primary">5979 cells</span></a>
+                                        <a href="#" onclick="Load_Dataset( 'all' )">All Cells<span class="badge badge-pill badge-primary">838,388 cells</span></a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'Intestine' )">Intestine<span class="badge badge-pill badge-primary">2330 cells</span></a>
+                                        <a href="#" onclick="Load_Dataset( 'data_SF1G' )">Infil. B-cells<span class="badge badge-pill badge-primary">19,586 cells</span></a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'Kidney' )">Kidney<span class="badge badge-pill badge-primary">2455 cells</span></a>
+                                        <a href="#" onclick="Load_Dataset( 'data_SF3A' )">Infil. NK/T cells<span class="badge badge-pill badge-primary">177,330 cells</span></a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'Lung' )">Lung<span class="badge badge-pill badge-primary">4375 cells</span></a>
+                                        <a href="#" onclick="Load_Dataset( 'fibroblast' )">Fibroblasts<span class="badge badge-pill badge-primary">104,692 cells</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a href="#">
+                                <i class="fas fa-project-diagram"></i>
+                                <span class="menu-text">Trajectory Inference</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a href="#" onclick="Load_Dataset( 'data_F5D' )">TEC~CAF_EndoMT~CAF_myo<span class="badge badge-pill badge-primary">7,363 cells</span></a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'Liver' )">Liver<span class="badge badge-pill badge-primary">4191 cells</span></a>
+                                        <a href="#" onclick="Load_Dataset( 'data_F4D' )">TAM~CAF_api~CAF_myo<span class="badge badge-pill badge-primary">1,487 cells</span></a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="Change_UMAP_Coordinate( 'Thymus' )">Thymus<span class="badge badge-pill badge-primary">2914 cells</span></a>
-                                    </li> -->
+                                        <a href="#" onclick="Load_Dataset( 'data_F2F' )">CAF differentiation<span class="badge badge-pill badge-primary">7,500 cells</span></a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
@@ -412,7 +419,7 @@ code {
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa-solid fa-location-pin"></i>
+                                <i class="fas fa-map-marker"></i>
                                 <span class="menu-text" data-toggle="collapse" data-target="#container_panel_sclncrna_expression_violin" aria-expanded="false" aria-controls="container_panel_datatable_cell_marker">Violin Plot</span>
                             </a>
                         </li>
@@ -624,12 +631,18 @@ code {
                 </li>
                 <li class="nav-item">
                     <select class="custom-select w-auto mx-2 my-0" id="select_dataset" title="select dataset" onchange="Load_Dataset( )">
-                        <option value="fibroblast">104,692 cells (fibroblasts only)</option>
-                        <option value="all">838,388 cells (full dataset)</option>
-                        <option value="10000cells_per_cluster">290,523 cells (1/3 subsampled)</option>
-                        <option value="5000cells_per_cluster">158,943 cells (1/5 subsampled)</option>
-                        <option value="2000cells_per_cluster" selected>66,741 cells (1/12 subsampled)</option>
-                        <option value="1000cells_per_cluster">34,647 cells (1/25 subsampled)</option>
+                        <option value="1000cells_per_cluster">1/25 subsampled (34,647 cells)</option>
+                        <option value="2000cells_per_cluster" selected>1/12 subsampled (66,741 cells)</option>
+                        <option value="5000cells_per_cluster">1/5 subsampled (158,943 cells)</option>
+                        <option value="all">full dataset (838,388 cells)</option>
+<!--                         <option value="10000cells_per_cluster">1/3 subsampled (290,523 cells)</option> --> 
+<!--     removed due to github site disk space limit                     -->
+                        <option value="data_SF1G">Tumor-infiltrating B lymphocytes (S.Fig. 1G)</option>
+                        <option value="data_SF3A">Tumor-infiltrating NK/T cell (S.Fig. 3A)</option>
+                        <option value="fibroblast">fibroblasts only (S.Fig. 2C)</option>
+                        <option value="data_F5D">TEC-CAF_EndoMT-CAF_myo trajectory (Fig. 5D)</option>
+                        <option value="data_F4D">TAM-CAF_api-CAF_myo trajectory (Fig. 4D)</option>
+                        <option value="data_F2F">CAF differentiation trajectory (Fig. 2F)</option>
                     </select>
                 </li>
             </ul>
@@ -999,14 +1012,16 @@ var DragSort=function(t){
     object_data.setting = { };
     object_data.setting.plot = { };
     object_data.flags = { };
-    async function Load_Dataset( ) {
+    async function Load_Dataset( name_adata = null ) {
         return new Promise( async function( resolve, reject ) { 
             // load dataset 
-            let name_adata = Select_Get_Selected_Option_Using_ID( 'select_dataset' ).value;
+            if ( name_adata === null ) { // if no argument is given, load dataset based on the selected value in the dataset selection field
+                name_adata = Select_Get_Selected_Option_Using_ID( 'select_dataset' ).value;
+            }
             console.log( "[Load_Dataset] loading data for ", name_adata );
             object_data.main.name_adata = name_adata; // update the name of the current data
             // for faster async loading, the data files will be loaded together
-            var l_remote_file = [ "current/rawdata/base64/box_precomputed.multiplied_by_1000.cell_type.tsv.gz.base64.txt",
+            var l_remote_file = [ "current/rawdata/base64/box_precomputed.all.multiplied_by_1000.cell_type.tsv.gz.base64.txt",
                                 "current/rawdata/base64/cell_marker.index.tsv.gz.base64.txt",
                                 "current/rawdata/base64/cells." + name_adata + ".tsv.gz.base64.txt",
                                 "current/rawdata/base64/expr." + name_adata + ".multiplied_by_1000.index.tsv.gz.base64.txt" ];
@@ -1406,6 +1421,16 @@ var DragSort=function(t){
        for( let i = length; i >= 0; i -- ) {
           selectElement.remove( i );
        }
+    }
+    function Update_Select_Options( select_element, l_text, l_value ) { // Update select options of a given select element
+        Select_RemoveOptions( select_element ); // remove all option in the select element
+        // add options
+        for ( let i = 0; i < l_text.length; i ++ ) {
+            let objOption = document.createElement( "option" );
+            objOption.text = l_text[ i ];
+            objOption.value = l_value[ i ];
+            select_element.options.add( objOption );
+        }
     }
     function Select_Get_Selected_Option_Using_ID( id_selectElement ) { // get selected option in the select element with its id
         let sel = document.getElementById( id_selectElement )
@@ -2497,6 +2522,7 @@ var DragSort=function(t){
     }; // define color for each tissue
     function SortBoxTrace( trace_a, trace_b ) { return - ( trace_a.q3 - trace_b.q3 ) } // Sort Plotly Boxplot traces based on parameter values
     object_data.main.preview_gene = { previous : { str_tissue : 'All', str_name_data_annotation : 'default', gene_symbol : 'default' } };
+    dict_name_adata_to_name_adata_for_box_plot_preview = { "1000cells_per_cluster" : "all", "2000cells_per_cluster" : "all", "5000cells_per_cluster" : "5000cells_per_cluster", "all" : "all", "data_SF1G" : "data_SF1G", "data_SF3A" : "data_SF3A", "fibroblast" : "all", "data_F5D" : "data_F5D", "data_F4D" : "data_F4D", "data_F2F" : "data_F2F" } // map name_adata used in the box plot gene expression preview graph for each name_adata
     async function PreviewGene( gene_symbol ) { // draw preview of expression of the current gene using boxplots
         // retrieve str_name_data_annotation from the current setting
         let str_name_data_annotation = object_data.main.umap.str_name_data_annotation,
@@ -2524,7 +2550,7 @@ var DragSort=function(t){
         if ( ! ( 'gene_summary' in object_data.main ) || str_name_data_annotation != object_data.main.gene_summary.str_name_data_annotation ) { // if box plot data has not been parsed or annotation data has been changed, initialize the data
             // update box plot data if the given 'str_name_data_annotation' is valid
             if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '' } ) {
-                let name_file_box_plot_summary = "box_precomputed.multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
+                let name_file_box_plot_summary = "box_precomputed." + dict_name_adata_to_name_adata_for_box_plot_preview[ object_data.main.name_adata ] + ".multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
                 await LoadRemoteData( [ object_data.file.base_url + name_file_box_plot_summary ] );
                 object_data.main.gene_summary = { };
                 object_data.main.gene_summary.boxplot = { };
