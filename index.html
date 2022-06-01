@@ -337,6 +337,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #F8F8F8;
+  color: black;
+  text-align: center;
+}
     </style>
     <!-- icon of the document -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='16'%20style='filter:%20invert(100%);'%3E🦠%3C/text%3E%3C/svg%3E" type="image/svg+xml" />
@@ -614,8 +623,8 @@ code {
 <div id="application-current-view"> 
 <div id="single_cell_lncrna_database">
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-navbar"> <!-- sticky-top -->
-        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo_compact.png" class="d-block w-100 ml-auto mr-2" style="max-width: 80px; max-height: 80px !important;" alt="West China Hospital Logo">
-        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo_compact.jpg" class="w-100 ml-2 mr-auto" style="max-width: 80px; max-height: 80px !important;" alt="GIST Logo">
+<!--         <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo_compact.png" class="d-block w-100 ml-auto mr-2" style="max-width: 80px; max-height: 80px !important;" alt="West China Hospital Logo">
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo_compact.png" class="w-100 ml-2 mr-auto" style="max-width: 80px; max-height: 80px !important;" alt="GIST Logo"> -->
         <a class="navbar-brand mb-0 h1" href="https://gist-fgl.github.io/sc-caf-atlas/">Single Cell Cancer Associated Fibroblast Atlas</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav_top" aria-controls="navbarNav_top" aria-expanded="false" aria-label="Toggle top navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav_top">
@@ -803,10 +812,13 @@ code {
         </nav>
         <div id="container_datatable_correl"><table id="datatable_correl" class="display" width="100%"></table></div>
     </div>
-<!--     <div>
-        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo.png" class="w-100 mr-2 ml-auto" style="max-width: 100px; max-height: 100px !important;" alt="West China Hospital Logo">
-        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.jpg" class="w-100 ml-2 mr-auto" style="max-width: 100px; max-height: 100px !important;" alt="GIST Logo">
-    </div> -->
+    <div class="footer">
+    <p>
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo.png" class="w-100 mx-auto" style="max-width: 120px; max-height: 150px !important;" alt="West China Hospital Logo">
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.png" class="w-100 mx-auto" style="max-width: 135px; max-height: 135px !important;" alt="GIST Logo">
+        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+    </div>
 <!--     <div id="container_interaction_network" class="collapse">
         <nav class="navbar navbar-dark bg-custom-navbar">
             <a class="navbar-brand mb-0 h5">Data Tables</a>
@@ -985,10 +997,10 @@ code {
                 
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">Start!</button>
+                <button class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">Start Exploring</button>
                 <h5 class="text-muted" style="text-align:center;">Single-cell data analysis has been conducted by Dr. Han Luo at the West China Hospital, Sichuan universtiy. The web application has been developed by Hyunsu An at Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
                 <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo.png" class="d-block w-100 ml-auto mr-2" style="max-width: 200px; max-height: 250px !important;" alt="West China Hospital Logo">
-                <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.jpg" class="d-block w-100 ml-2 mr-auto" style="max-width: 230px; max-height: 230px !important;" alt="GIST Logo">
+                <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.png" class="d-block w-100 ml-2 mr-auto" style="max-width: 230px; max-height: 230px !important;" alt="GIST Logo">
             </div>
         </div>
     </div>
@@ -2159,7 +2171,7 @@ var DragSort=function(t){
         object_data.main.umap.str_name_data_annotation = Select_Get_Selected_Option_Using_ID( "select_umap_annotation_data" ).value
         
         // change annotations
-        PlotCellAnnotation( flag_restyle = true ) // update UMAP annotation plot
+        PlotCellAnnotation( flag_restyle = false ) // update UMAP annotation plot // does not restyle graph
         UpdateGene( flag_restyle = true ) // update gene expression (violin plots)
         PreviewGene( object_data.main.gene.gene_symbol ); // update box plot data for the current annotation
     }
@@ -2423,7 +2435,7 @@ var DragSort=function(t){
                 object_data.main.umap.dict_color_anno = dict_color[ str_name_data_annotation ]; // update colors of the current annotation
                 console.log( str_name_data_annotation, dict_color ); 
                 l_color = ArrayMap( dictarr[ str_name_data_annotation ], object_data.main.umap.dict_color_anno, '#A9A9A9' ); // default color is '#A9A9A9'
-                str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <b>%{marker.color:." + ( ( str_name_option_selected in { 'Pseudotime' : true, 'MT Percentage' : true } ) ? 2 : 0 ).toString( ) + "f}</b><br>"; // only MT percentage data will be shown as floating point numbers
+                str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <i><b>%{customdata[5]}</b></i><br>"; // only MT percentage data will be shown as floating point numbers
                 break;
             default: // by default shows color based on continuous values
                 l_color = dictarr[ str_name_data_annotation ];
@@ -2490,7 +2502,8 @@ var DragSort=function(t){
                                               dictarr[ 'cell_type' ],
                                               dictarr[ 'cell_anno_detailed' ],
                                               dictarr[ "tissue" ],
-                                              dictarr[ 'cell_barcode' ]
+                                              dictarr[ 'cell_barcode' ],
+                                              dictarr[ str_name_data_annotation ]
                                             ] ),
                 hovertemplate: [ str_hovertemplate_additional_line + "cluster: <b>%{customdata[0]}</b>",
                                 "cell type (detailed): <b>%{customdata[2]}</b>",
@@ -2520,6 +2533,11 @@ var DragSort=function(t){
             plotSingleCellAnnotation.on( "plotly_relayout" , function( ed ) {
                 PlotlySynchronizedLayout( ed, l_div_plotly );
             });
+            // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
+            let lay = plotSingleCellExpression.layout
+            if ( ! ( lay.xaxis.autorange && lay.yaxis.autorange ) ) { // only trigger relayout if there is an alteration of coordinates of 'plotSingleCellExpression'
+                Plotly.relayout( plotSingleCellAnnotation, { 'xaxis.range[0]': lay.xaxis.range[ 0 ], 'xaxis.range[1]': lay.xaxis.range[ 1 ], 'xaxis.autorange': lay.xaxis.autorange, 'yaxis.range[0]': lay.yaxis.range[ 0 ], 'yaxis.range[1]': lay.yaxis.range[ 1 ], 'yaxis.autorange': lay.yaxis.autorange } ); // perform relayout operation
+            }
         }
     }
     async function PlotlyCallBackSingleCellMarker( clicked_point ) { // load the cell-type marker gene table of the cell-type to which the clicked cell belongs
