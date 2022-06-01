@@ -370,10 +370,10 @@ code {
                     </div>
                 </div> -->
                 <!-- sidebar-menu  -->
-                <div class=" sidebar-item sidebar-menu">
+                <div class="sidebar-item sidebar-menu">
                     <ul>
                         <li class="header-menu">
-                            <span>Change UMAP Coordinates</span>
+                            <span>Change UMAP Embedding</span>
                         </li>
                         <li class="sidebar-dropdown">
                             <a href="#">
@@ -383,7 +383,7 @@ code {
                             <div class="sidebar-submenu">
                                 <ul>
                                     <li>
-                                        <a href="#" onclick="Load_Dataset( 'all' )">All Cells<span class="badge badge-pill badge-primary">838,388 cells</span></a>
+                                        <a href="#" onclick="Load_Dataset( '2000cells_per_cluster' )">All Cells<span class="badge badge-pill badge-primary">838,388 cells</span></a>
                                     </li>
                                     <li>
                                         <a href="#" onclick="Load_Dataset( 'data_SF1G' )">Infil. B-cells<span class="badge badge-pill badge-primary">19,586 cells</span></a>
@@ -396,6 +396,8 @@ code {
                                     </li>
                                 </ul>
                             </div>
+                        </li>
+                        <li class="sidebar-dropdown">
                             <a href="#">
                                 <i class="fas fa-project-diagram"></i>
                                 <span class="menu-text">Trajectory Inference</span>
@@ -634,9 +636,9 @@ code {
                         <option value="1000cells_per_cluster">1/25 subsampled (34,647 cells)</option>
                         <option value="2000cells_per_cluster" selected>1/12 subsampled (66,741 cells)</option>
                         <option value="5000cells_per_cluster">1/5 subsampled (158,943 cells)</option>
-                        <option value="all">full dataset (838,388 cells)</option>
-<!--                         <option value="10000cells_per_cluster">1/3 subsampled (290,523 cells)</option> --> 
+<!--                         <option value="all">full dataset (838,388 cells)</option> -->
 <!--     removed due to github site disk space limit                     -->
+                        <option value="10000cells_per_cluster">1/3 subsampled (290,523 cells)</option> 
                         <option value="data_SF1G">Tumor-infiltrating B lymphocytes (S.Fig. 1G)</option>
                         <option value="data_SF3A">Tumor-infiltrating NK/T cell (S.Fig. 3A)</option>
                         <option value="fibroblast">fibroblasts only (S.Fig. 2C)</option>
@@ -683,7 +685,7 @@ code {
                             <option value="disease">Disease Name</option>
                             <option value="cancer_stage">Cancer Stage</option>
                             <option value="sampling_site">Sampling Site</option>
-                            <option value="group">Cell Group</option>
+                            <option value="group">Tumor/Normal</option>
                         </select>
 <!--                         <button class="btn btn-light btn-sm mx-2 my-0" type="button" data-toggle="button" data-tooltip="tooltip" data-placement="left" data-html="true" title="Press to <b>on/off</b> the <i>legend</i> of the graph" id="button_toggle_legend_UMAP" onclick="Toggle_Legend_UMAP( )"><i class="fas fa-list"></i></button> -->
                     </form>
@@ -922,9 +924,7 @@ code {
                 <h2></h2>
                 
                 <h2></h2>
-				
-				
-				<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
                         <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
                         <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
@@ -962,7 +962,6 @@ code {
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
-				
                 <!-- <img src="img/abstract.jpg" alt="introduction images" style="min-width:50%;max-width:90%;display: block;margin-left: auto;margin-right: auto;"> -->
                 <br>
                 <div class="card mx-auto my-2" style="max-width: 60rem;">
@@ -975,7 +974,7 @@ code {
 
 <!--                 <h1 class="modal-title">Usages</h1> -->
 
-                <h5 class="text-muted" style="text-align:center;">The web application has been developed by Hyunsu An at Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
+                <h5 class="text-muted" style="text-align:center;">Single-cell data analysis has been conducted by Dr. Han Luo at the West China Hospital, Sichuan universtiy. The web application has been developed by Hyunsu An at Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">Start!</button>
@@ -1017,6 +1016,8 @@ var DragSort=function(t){
             // load dataset 
             if ( name_adata === null ) { // if no argument is given, load dataset based on the selected value in the dataset selection field
                 name_adata = Select_Get_Selected_Option_Using_ID( 'select_dataset' ).value;
+            } else { // if argument is given, change the selected item of the select_dataset select element
+                Select_ChangeSelected( document.getElementById( 'select_dataset' ), name_adata )
             }
             console.log( "[Load_Dataset] loading data for ", name_adata );
             object_data.main.name_adata = name_adata; // update the name of the current data
@@ -1031,8 +1032,49 @@ var DragSort=function(t){
             int_size_ResponsiveMarkerSize = Math.max( Math.min( 5, parseInt( 350000 / object_data.main.int_num_cells ) ), 2 ); // set the size of markers responsively
             await ParseData( );
             
+            // update cell metadata column names
+            let l_option_text = [ ], l_option_value = [ ], select_annotation = document.getElementById( 'select_umap_annotation_data' ), val_default = 'name_cluster'; // default annotation column name
+            // add metadata shared by all datasets
+            l_option_value.push( ... [ "name_cluster", "cell_anno_detailed", "cell_type", "tissue", "nCount_RNA", "nFeature_RNA", "percent_mt", "gender", "disease", "cancer_stage", "sampling_site", "group" ] );
+            l_option_text.push( ... [ 'Cluster', 'Cell Type (Detailed)', 'Cell Type (Basic)', 'Tissue', 'Number of mRNA', 'Number of Genes', 'MT Percentage', 'Biological Sex', 'Disease Name', 'Cancer Stage', 'Sampling Site', 'Tumor/Normal' ] );
+            // add dataset-specific metadata
+            switch ( name_adata ) {
+                case 'all' :
+                case '1000cells_per_cluster' :
+                case '2000cells_per_cluster' :
+                case '5000cells_per_cluster' :
+                case '10000cells_per_cluster' :
+                case 'fibroblast' :
+                    break;
+                case 'data_SF1G' :
+                    l_option_value.push( ... [ 'seurat_clusters' ] );
+                    l_option_text.push( ... [ 'Seurat Clus.' ] );
+                    val_default = 'seurat_clusters'; //  'seurat_clusters';
+                    break;
+                case 'data_SF3A' :
+                    l_option_value.push( ... [ 'seurat_clusters', 'cell_anno_subclustering' ] );
+                    l_option_text.push( ... [ 'Seurat Clus.', 'Cell Type (Subclustering)' ] );
+                    val_default =  'cell_anno_subclustering'; // 'cell_anno_subclustering';
+                    break
+                case 'data_F2F':
+                    l_option_value.push( ... [ 'state_detailed', 'pseudotime' ] );
+                    l_option_text.push( ... [ 'Cell State', 'Pseudotime' ] );
+                    val_default = 'cell_anno_detailed';
+                    break;
+                case 'data_F5D': 
+                case 'data_F4D': 
+                    l_option_value.push( ... [ 'state', 'pseudotime' ] );
+                    l_option_text.push( ... [ 'Cell State', 'Pseudotime' ] );
+                    val_default = 'cell_anno_detailed';
+                    break;
+                default: 
+                    alert( name_adata );
+            }
+            Update_Select_Options( select_annotation, l_option_text, l_option_value );
+            Select_ChangeSelected( select_annotation, val_default );
+            
             // plot graph
-            await Change_UMAP_Coordinate( 'All' )
+            await Change_UMAP_Coordinate( name_adata )
             
             console.log( "[Load_Dataset] resolved" );
             Loading_Screen( false );
@@ -1422,6 +1464,11 @@ var DragSort=function(t){
           selectElement.remove( i );
        }
     }
+    function Select_ChangeSelected( select_element, value_of_option_to_select ) { // change selected option of a select element
+        const arr_option = Array.from( select_element.options );
+        const option_to_select = arr_option.find( item => item.value === value_of_option_to_select );
+        option_to_select.selected = true;
+    };
     function Update_Select_Options( select_element, l_text, l_value ) { // Update select options of a given select element
         Select_RemoveOptions( select_element ); // remove all option in the select element
         // add options
@@ -1920,9 +1967,9 @@ var DragSort=function(t){
     object_data.setting.expression.n_digits_below_floating_point = 3; // number of digits below floading point of the original expression values (converted to integer by multiplying 1000 during delivery of the data)
     object_data.main.datatable = { 'datatable_cell_marker' : { df : null, name : 'cell_marker' }, 'datatable_correl' : { df : null, name : 'correl_gene' } };
     
-    async function Change_UMAP_Coordinate( str_tissue = null ) { 
+    async function Change_UMAP_Coordinate( str_dataset = null ) { 
         return new Promise( async function( resolve, reject ) { 
-            if ( str_tissue === null ) {
+            if ( str_dataset === null ) {
                 // change x or y-axis of scatter plot using the current setting
                 let select_x_axis = $id( 'select_scatter_x_axis' ),
                     select_y_axis = $id( 'select_scatter_y_axis' ),
@@ -2000,15 +2047,15 @@ var DragSort=function(t){
                 let name_adata = object_data.main.name_adata; // retrieve the name of the current dataset
                 // change UMAP coordinates to the UMAP coordinates of the given subclustering
                 // only update coordinates when subclustering or name of dataset is different
-                if ( ( str_tissue == object_data.main.umap.tissue ) && ( name_adata == object_data.main.umap.name_adata ) ) {
-                    console.log( "[Change_UMAP_Coordinate] UMAP coordinates of", str_tissue, 'for', name_adata, "already drawn, exiting" );
+                if ( ( str_dataset == object_data.main.umap.dataset ) && ( name_adata == object_data.main.umap.name_adata ) ) {
+                    console.log( "[Change_UMAP_Coordinate] UMAP coordinates of", str_dataset, 'for', name_adata, "already drawn, exiting" );
                     return -1;
                 }
-                object_data.main.umap.tissue = str_tissue; // update str_tissue of the main UMAP graph
+                object_data.main.umap.dataset = str_dataset; // update str_dataset of the main UMAP graph
                 object_data.main.umap.name_adata = name_adata // update the name of the current dataset
-                object_data.main.umap.flag_all_tissues = str_tissue == 'All'; // flag indicating whether UMAP coordinates of all tissues are used.
+                object_data.main.umap.flag_all_cells_are_used = true;  // currently all dataset represent the all dataset str_dataset == 'all'; // flag indicating whether UMAP coordinates of all tissues are used.
                 let dictarr = object_data.file.dict_name_file_to_parsed_data[ "cells." + name_adata + ".tsv.gz.base64.txt" ];
-                if ( object_data.main.umap.flag_all_tissues ) {
+                if ( object_data.main.umap.flag_all_cells_are_used ) {
                     object_data.main.umap.dictarr = dictarr;
                 } else {
                     // build a boolean index for retrieving UMAP coordinates (and other data) for the current tissue
@@ -2016,7 +2063,7 @@ var DragSort=function(t){
                         l_bool_index = [ ],
                         i = 0;
                     for ( i = 0; i < l_tissue.length; i ++ ) {
-                        l_bool_index.push( l_tissue[ i ] == str_tissue );
+                        l_bool_index.push( l_tissue[ i ] == str_dataset );
                     }
                     object_data.main.umap.l_bool_index_tissue = l_bool_index;
                     object_data.main.umap.dictarr = DictArrBooleanIndexing( dictarr, l_bool_index );
@@ -2108,7 +2155,7 @@ var DragSort=function(t){
     
     async function UpdateGene( flag_restyle = false ) { // draw a new plot by default
         console.log( "[UpdateGene] updating gene started" );
-        let str_tissue = object_data.main.umap.tissue, // retrieve current tissue
+        let str_dataset = object_data.main.umap.dataset, // retrieve current tissue
             gene_symbol = object_data.main.gene.gene_symbol;
         
         // update plot (Single Cell Expression)
@@ -2122,7 +2169,7 @@ var DragSort=function(t){
             l_expr = object_data.main.gene.expr.data[ gene_symbol ].data,
             argsort_l_expr = argsort( l_expr ), // retrieve argsort for l_expr data
             col_name_cell_type = 'cell_type';
-        if ( ! object_data.main.umap.flag_all_tissues ) {
+        if ( ! object_data.main.umap.flag_all_cells_are_used ) {
             l_expr = ArrayBooleanIndexing( l_expr, object_data.main.umap.l_bool_index_tissue );
             col_name_cell_type = 'tissue_cell_type';
         }
@@ -2132,24 +2179,24 @@ var DragSort=function(t){
                 l_expr_x_axis = [ ];
             await UpdateCache( object_cache, preprocess_expr, [ gene_symbol_x_axis ] ); // retrieve the single cells expression data of the current gene.
             l_expr_x_axis = object_data.main.gene.expr.data[ gene_symbol_x_axis ].data;
-            if ( ! object_data.main.umap.flag_all_tissues ) {
+            if ( ! object_data.main.umap.flag_all_cells_are_used ) {
                 l_expr_x_axis = ArrayBooleanIndexing( l_expr_x_axis, object_data.main.umap.l_bool_index_tissue );
             }
             dictarr[ '__x_axis_gene_expr__' ] = l_expr_x_axis;
         } else {
-            object_data.main.scatter.x_axis_col_name = ( object_data.main.umap.flag_all_tissues ) ? 'UMAP_1' : 'tissue_UMAP_1';
+            object_data.main.scatter.x_axis_col_name = ( object_data.main.umap.flag_all_cells_are_used ) ? 'UMAP_1' : 'tissue_UMAP_1';
         }
         if ( object_data.main.scatter.y_axis_col_name == '__y_axis_gene_expr__' ) {
             let gene_symbol_y_axis = object_data.main.scatter.y_axis_option,
                 l_expr_y_axis = [ ];
             await UpdateCache( object_cache, preprocess_expr, [ gene_symbol_y_axis ] ); // retrieve the single cells expression data of the current gene.
             l_expr_y_axis = object_data.main.gene.expr.data[ gene_symbol_y_axis ].data;
-            if ( ! object_data.main.umap.flag_all_tissues ) {
+            if ( ! object_data.main.umap.flag_all_cells_are_used ) {
                 l_expr_y_axis = ArrayBooleanIndexing( l_expr_y_axis, object_data.main.umap.l_bool_index_tissue );
             }
             dictarr[ '__y_axis_gene_expr__' ] = l_expr_y_axis;
         } else {
-            object_data.main.scatter.y_axis_col_name = ( object_data.main.umap.flag_all_tissues ) ? 'UMAP_2' : 'tissue_UMAP_2';
+            object_data.main.scatter.y_axis_col_name = ( object_data.main.umap.flag_all_cells_are_used ) ? 'UMAP_2' : 'tissue_UMAP_2';
         }
         // complete the selection process by re-enabling the selection button
         $id( 'select_scatter_x_axis' ).disabled = false; 
@@ -2247,63 +2294,84 @@ var DragSort=function(t){
         let str_name_data_annotation = Select_Get_Selected_Option_Using_ID( "select_umap_annotation_data" ).value;
         object_data.main.umap.str_name_data_annotation = str_name_data_annotation;
         
-        // build list of traces for each category
-        dictarr = Pivot( object_data.main.umap.dictarr[ str_name_data_annotation ], l_expr ); // key = cluster, value = list of expression values.
-        let trace_template = { 
-            type: 'violin',
-            opacity: 0.6,
-            box: { visible: true, width: 0.075 },
-            meanline: { visible: true }
-        },
-            l_category = Object.keys( dictarr ),
-            str_separation = ( plotSingleCellExpressionViolin.offsetWidth > 3000 ) ? '<br>' : ' ' ; // set 'str_separation' based on current width to increase responsiveness of the plot
-        let l_trace = [ ];
-        for ( let category in dictarr ) {
-            let l_expr = dictarr[ category ],
-                n_cells = l_expr.length, // retrieve number of cells for the current category
-                n_ceels_original = object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_num_cells[ str_tissue ][ str_name_data_annotation ][ category ],
-                float_mean_expression = ArrayAverage( l_expr ), // retrieve a mean expression of cells for the current trace
-                object_RemoveNegativeCells = RemoveNegativeCells( l_expr ), // retrieve list of expression values excluding cells with zero counts
-                n_cells_with_zero_count = object_RemoveNegativeCells.n_cells_nagative,
-                l_expr_without_negative_cells = object_RemoveNegativeCells.l_expr_without_negative_cells;
-
-            let trace = { ... trace_template,
-                         x0: "", 
-                         y: [ ],
-                         name: category,
-                         line: { color: 'black', width: 2 },
-                         fillcolor: object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_color[ str_tissue ][ str_name_data_annotation ][ category ],
-                         points: false, // do not show outliers to increase responsivity
-                         y_ignore_cells_with_zero_counts__true: l_expr_without_negative_cells,
-                         y_ignore_cells_with_zero_counts__false: ArrayFull( n_cells_with_zero_count, 0 ).concat( l_expr_without_negative_cells ),
-                         x0_ignore_cells_with_zero_counts__true: category + str_separation + "(n=" + ( n_cells - n_cells_with_zero_count ) + ' of ' + n_cells + ( n_cells == n_ceels_original ? '' : '/' + n_ceels_original ) + ')',
-                         x0_ignore_cells_with_zero_counts__false: category + str_separation + "(n=" + n_cells + ( n_cells == n_ceels_original ? '' : '/' + n_ceels_original ) + ')',
-                         mean_expression_for_sorting: float_mean_expression
-                        };
-            l_trace.push( trace );
+        // only update violine plot when category has string datatype
+        if ( typeof object_data.main.umap.dictarr[ str_name_data_annotation ][ 0 ] == 'string' ) {
+            // build list of traces for each category
+            dictarr = Pivot( object_data.main.umap.dictarr[ str_name_data_annotation ], l_expr ); // key = cluster, value = list of expression values.
+            let trace_template = { 
+                type: 'violin',
+                opacity: 0.6,
+                box: { visible: true, width: 0.075 },
+                meanline: { visible: true }
+            },
+                l_category = Object.keys( dictarr ),
+                str_separation = ( plotSingleCellExpressionViolin.offsetWidth > 3000 ) ? '<br>' : ' ' ; // set 'str_separation' based on current width to increase responsiveness of the plot
+            let l_trace = [ ];
+            for ( let category in dictarr ) {
+                let l_expr = dictarr[ category ],
+                    n_cells = l_expr.length, // retrieve number of cells for the current category
+                    n_cells_original = -1, // initialize 'n_cells_original'
+                    float_mean_expression = ArrayAverage( l_expr ), // retrieve a mean expression of cells for the current trace
+                    object_RemoveNegativeCells = RemoveNegativeCells( l_expr ), // retrieve list of expression values excluding cells with zero counts
+                    n_cells_with_zero_count = object_RemoveNegativeCells.n_cells_nagative,
+                    l_expr_without_negative_cells = object_RemoveNegativeCells.l_expr_without_negative_cells,
+                    dict_num_cells = object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_num_cells,
+                    str_dataset_default = 'all'; // set default dataset
+                if ( ( str_dataset in dict_num_cells ) && ( str_name_data_annotation in dict_num_cells[ str_dataset ] ) && ( category in dict_num_cells[ str_dataset ][ str_name_data_annotation ] ) ) {
+                    n_cells_original = object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_num_cells[ str_dataset ][ str_name_data_annotation ][ category ];
+                } else {
+                    if ( str_name_data_annotation in dict_num_cells[ str_dataset_default ] ) {
+                        n_cells_original = object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_num_cells[ str_dataset_default ][ str_name_data_annotation ][ category ];
+                    } else {
+                        n_cells_original = n_cells; // if it appears there are no 'original' dataset from which to retrieve the original number of cells, set the current number of cells as the original number of cells
+                    }
+                }
+                let trace = { ... trace_template,
+                             x0: "", 
+                             y: [ ],
+                             name: category,
+                             line: { color: 'black', width: 2 },
+                             fillcolor: object_data.main.umap.dict_color_anno[ category ],
+                             points: false, // do not show outliers to increase responsivity
+                             y_ignore_cells_with_zero_counts__true: l_expr_without_negative_cells,
+                             y_ignore_cells_with_zero_counts__false: ArrayFull( n_cells_with_zero_count, 0 ).concat( l_expr_without_negative_cells ),
+                             x0_ignore_cells_with_zero_counts__true: category + str_separation + "(n=" + ( n_cells - n_cells_with_zero_count ) + ' of ' + n_cells + ( n_cells == n_cells_original ? '' : '/' + n_cells_original ) + ')',
+                             x0_ignore_cells_with_zero_counts__false: category + str_separation + "(n=" + n_cells + ( n_cells == n_cells_original ? '' : '/' + n_cells_original ) + ')',
+                             mean_expression_for_sorting: float_mean_expression
+                            };
+                l_trace.push( trace );
+            }
+            l_trace = l_trace.sort( SortViolinTrace_Expression ); // sort by mean expression
+            let layout = {
+                margin: { l: 50, r: 65, b: 150, t: 50, pad: 4 },
+                yaxis: { title : "Normalized Expression", rangemode: "nonnegative" },
+                legend: { tracegroupgap: 0 },
+                violingap: 0, // split violin plot for two covid statuses
+                violingroupgap: 0,
+                violinmode: "overlay",
+            }
+            for ( let i = 0; i < l_trace.length; i ++ ) { // swap y and x0 values based on the 'object_plot_scrnaseq.option.ignore_cells_with_zero_counts' setting
+                l_trace[ i ].x0 = object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts ? l_trace[ i ].x0_ignore_cells_with_zero_counts__true : l_trace[ i ].x0_ignore_cells_with_zero_counts__false ;
+                l_trace[ i ].y = object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts ? l_trace[ i ].y_ignore_cells_with_zero_counts__true : l_trace[ i ].y_ignore_cells_with_zero_counts__false ;
+            }
+            Plotly.newPlot( plotSingleCellExpressionViolin, l_trace, layout, { ... config_plotly, filename: name_application + '__Expression_of_' + gene_symbol, height: 600, width: 1100 } );
         }
-        l_trace = l_trace.sort( SortViolinTrace_Expression ); // sort by mean expression
-        let layout = {
-            margin: { l: 50, r: 65, b: 150, t: 50, pad: 4 },
-            yaxis: { title : "Normalized Expression", rangemode: "nonnegative" },
-            legend: { tracegroupgap: 0 },
-            violingap: 0, // split violin plot for two covid statuses
-            violingroupgap: 0,
-            violinmode: "overlay",
-        }
-        for ( let i = 0; i < l_trace.length; i ++ ) { // swap y and x0 values based on the 'object_plot_scrnaseq.option.ignore_cells_with_zero_counts' setting
-            l_trace[ i ].x0 = object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts ? l_trace[ i ].x0_ignore_cells_with_zero_counts__true : l_trace[ i ].x0_ignore_cells_with_zero_counts__false ;
-            l_trace[ i ].y = object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts ? l_trace[ i ].y_ignore_cells_with_zero_counts__true : l_trace[ i ].y_ignore_cells_with_zero_counts__false ;
-        }
-        Plotly.newPlot( plotSingleCellExpressionViolin, l_trace, layout, { ... config_plotly, filename: name_application + '__Expression_of_' + gene_symbol, height: 600, width: 1100 } );
     }
     object_data.setting.plot.annotation = { };
-    object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_color = { 'All' : { 'name_cluster' : { 'c1' : '#7FC2E9', 'c2' : '#77A0D4', 'c3' : '#4F91C0', 'c4' : '#4586B3', 'c5' : '#3589B4', 'c6' : '#146AA5', 'c7' : '#156BA1', 'c8' : '#0B5687', 'c9' : '#F4F4C1', 'c10' : '#EFE6A3', 'c11' : '#F7DD90', 'c12' : '#F4BE51', 'c13' : '#F2942F', 'c14' : '#E16C1A', 'c15' : '#C14D1D', 'c16' : '#862F21', 'c17' : '#5E2014', 'c18' : '#8892BF', 'c19' : '#9D86B5', 'c20' : '#9175B3', 'c21' : '#805FA6', 'c22' : '#7F3E93', 'c23' : '#791C74', 'c24' : '#431F45', 'c25' : '#56B091', 'c26' : '#4BB355', 'c27' : '#1C8544', 'c28' : '#136A36', 'c29' : '#02351B', 'c30' : '#935424', 'c31' : '#B7761C', 'c32' : '#B99132', 'c33' : '#A88937', 'c34' : '#9D733F', 'c35' : '#A9A9A9', 'discarded' : '#A9A9A9' }, 'cell_type' : { 'Endothelium' : '#D9CD97', 'Epithelium' : '#C55044', 'Fibroblast' : '#6F89A8', 'Lymphocyte' : '#556F60', 'Myeloid' : '#534C7D', 'Plasma' : '#8A7148' }, 'group' : { 'Normal' : '#805FA6', 'Adjacent' : '#4F91C0', 'Tumor' : '#F2942F' }, 'tissue' : { 'lung' : '#54A894', 'PDAC' : '#9ACFC2', 'Bladder' : '#B7A48F', 'colorectal' : '#ECA289', 'thyroid' : '#8B6F57', 'gastric' : '#DD6043', 'breast' : '#515F8C', 'prostate' : '#D23B27', 'ICC' : '#68B9CE', 'ovarian' : '#8E98B6', 'liver' : '#68B9CE' }, 'gender' : { 'F': '#8774c2', 'M': '#e44a1b' }, 'disease' : { 'prostate-cancer': '#401a51', 'ovarian-cancer': '#5e195b', 'breast-cancer': '#4c3adf', 'colorectal-cancer': '#87537a', 'Pca': '#2c5f9d', 'ADC': '#77c425', 'ADC(Double)': '#b42e9a', 'Intrahepatic-cholangiocarcinoma': '#fde4ea', 'Squamous-': '#c8691d', 'Adenomatous': '#3872d1', 'Large-cell': '#000646', 'Squamous': '#9f79c4', 'Pleiomorphic': '#c53426', 'normal-pancreas/mucinous-cystic-neoplasia-': '#3b9249', 'normal-pancreas/choledochal-neuroendocrine-tumors': '#0b4887', 'normal-pancreas/solid-pseudopapillary-tumor': '#87a507', 'normal-pancreas/small intestine papillary adenocarinoma': '#163502', 'normal-pancreas/duodenal-intraepithelial-neoplasia': '#b77609', 'normal-pancreas/pancratic-neuroendocrine-tumor': '#bdc979', 'normal-pancreas/serous-cystic-neoplasia': '#682404', 'moderately-poorly-differentiated-PDAC': '#5c1006', 'poorly-differentiated-PDAC': '#8a2706', 'well-differentiated-PDAC': '#8e6429', 'moderately-differentiated-PDAC': '#2bcb1d', 'well-moderately-differentiated-PDAC': '#4a452f', 'PDAC': '#5e8c36', 'bladder-urothelial-tumor': '#bb264f', 'control': '#6394f8', 'thyroid-cancer': '#91d27a', 'Adenocarcinoma': '#9d3c1f', 'Severe-intestinal-metaplasia-,-mild-atrophy,-no-dysplasia': '#9198b1' }, 'cancer_stage' : { 'IA': '#b8e64a', 'IB': '#e77800', 'IIA': '#a35700', 'IIIA': '#d0919e', 'IA3': '#f94f9d', 'III': '#32cbcf', 'II': '#be67ee', 'IIIB': '#f55347', 'IIB': '#2b5e29', 'normal': '#8a5504', 'high-grade': '#53cab9', 'low-grade': '#f02235', 'IVB': '#93c066', 'IVC': '#801cb8', 'I': '#296bf2', 'Invasive adenocarcarcinoma with mucinous and signet ring features': '#ab86fc', 'Diffuse poorly cohesive adenocarcinoma with signet ring features': '#5a68c0', 'Intestinal invasive adenocarcinoma ': '#d3fbab', 'Intestinal adenocarcinoma': '#6f2dc8', 'Mixed intestinal poorly cohesive adenocarcinoma with signet ring component': '#4cd963' }, 'sampling_site' : { 'normal tissue adjacent to neoplasm ': '#178da0', 'normal tissue adjacent to neoplasm': '#9aec7c', 'neoplasm': '#72f6e3', 'neoplasm core': '#a9b77f', 'neoplasm border': '#9b7baf', 'nLung': '#8efdde', 'tLung': '#ea89a5', 'normal': '#663536', 'tumor': '#747294', 'core': '#2bbc14', 'middle': '#9375c1', 'edge': '#5ed157', 'tail': '#855b8d', 'common bile duct': '#68beba', 'body': '#861ce2', 'descending duodenum': '#c2482e', 'body and tail': '#0302b6', 'uncinate process': '#049734', 'head': '#814130', 'adjacent normal mucosae': '#7ddc1f', 'GEJ+stomach': '#0cbda0', 'Body ': '#e85033', 'Gastric': '#062052', 'Body and antrum invovled': '#131ccc', 'GEJ': '#b098db', 'lower esophagus: center is 0.2 cm above GEJ': '#21de80', 'lower esophagus: center is 0.3 cm above GEJ': '#5e83e9', 'Cardia GEJ': '#8b4e90', 'Body lesser curve': '#cd558d' }, 'cell_anno_detailed' : {'plasma cell (PC)': '#36d8c8', 'lymphoid cells (LC)': '#d5570e', 'tumor/adjacent confined suppressive dendrite cells (suppressive DC)': '#840627', 'cancerous/normal epithelial cells (EP)': '#975314', 'myeloid cells (MC)': '#bbc8c9', 'APOE+ tumor associated macrophage (APOE+ TAM)': '#c3917e', 'normal fibroblasts (NF)': '#73e105', 'normal endothelial cells (NEC)': '#a949e0', 'cancer-associated myofibroblasts (CAF_myo)': '#42cfb7', 'antigen-presenting fibroblasts (CAF_api)': '#b54752', 'fibroblast-like peripheral nerve cells (CAF_PN)': '#15b783', 'tumor endothelial cells (TEC)': '#9f2b4a', 'adipogenic CAF (CAF_adi)': '#a9bd97', 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)': '#1567b5', 'endothelial cells (EC)': '#b085b2', 'inflammatory CAF (CAF_infla)': '#c5cc9b', 'FABP4+ macrophage (FABP4+ MP)': '#6fec08', 'plasmacytoid DCs (pDC)': '#3c0840', 'discarded (discarded)': '#9e8ab6'}, 'cell_anno_abbreviation' : {'PC': '#36d8c8', 'LC': '#d5570e', 'suppressive DC': '#840627', 'EP': '#975314', 'MC': '#bbc8c9', 'APOE+ TAM': '#c3917e', 'NF': '#73e105', 'NEC': '#a949e0', 'CAF_myo': '#42cfb7', 'CAF_api': '#b54752', 'CAF_PN': '#15b783', 'TEC': '#9f2b4a', 'CAF_adi': '#a9bd97', 'CAF_EndoMT': '#1567b5', 'EC': '#b085b2', 'CAF_infla': '#c5cc9b', 'FABP4+ MP': '#6fec08', 'pDC': '#3c0840', 'discarded': '#9e8ab6'} } }; // define color for each cell type // currently color and cluster annotation for c0, c1, c2 are uncertain (need to receive a correct Rds file)
+    object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_color = { 
+        'all' : { 'name_cluster' : { 'c1' : '#7FC2E9', 'c2' : '#77A0D4', 'c3' : '#4F91C0', 'c4' : '#4586B3', 'c5' : '#3589B4', 'c6' : '#146AA5', 'c7' : '#156BA1', 'c8' : '#0B5687', 'c9' : '#F4F4C1', 'c10' : '#EFE6A3', 'c11' : '#F7DD90', 'c12' : '#F4BE51', 'c13' : '#F2942F', 'c14' : '#E16C1A', 'c15' : '#C14D1D', 'c16' : '#862F21', 'c17' : '#5E2014', 'c18' : '#8892BF', 'c19' : '#9D86B5', 'c20' : '#9175B3', 'c21' : '#805FA6', 'c22' : '#7F3E93', 'c23' : '#791C74', 'c24' : '#431F45', 'c25' : '#56B091', 'c26' : '#4BB355', 'c27' : '#1C8544', 'c28' : '#136A36', 'c29' : '#02351B', 'c30' : '#935424', 'c31' : '#B7761C', 'c32' : '#B99132', 'c33' : '#A88937', 'c34' : '#9D733F', 'c35' : '#A9A9A9', 'discarded' : '#A9A9A9' }, 'cell_type' : { 'Endothelium' : '#D9CD97', 'Epithelium' : '#C55044', 'Fibroblast' : '#6F89A8', 'Lymphocyte' : '#556F60', 'Myeloid' : '#534C7D', 'Plasma' : '#8A7148' }, 'group' : { 'Normal' : '#805FA6', 'Adjacent' : '#4F91C0', 'Tumor' : '#F2942F' }, 'tissue' : { 'lung' : '#54A894', 'PDAC' : '#9ACFC2', 'Bladder' : '#B7A48F', 'colorectal' : '#ECA289', 'thyroid' : '#8B6F57', 'gastric' : '#DD6043', 'breast' : '#515F8C', 'prostate' : '#D23B27', 'ICC' : '#68B9CE', 'ovarian' : '#8E98B6', 'liver' : '#68B9CE' }, 'gender' : { 'F': '#8774c2', 'M': '#e44a1b' }, 'disease' : { 'prostate-cancer': '#401a51', 'ovarian-cancer': '#5e195b', 'breast-cancer': '#4c3adf', 'colorectal-cancer': '#87537a', 'Pca': '#2c5f9d', 'ADC': '#77c425', 'ADC(Double)': '#b42e9a', 'Intrahepatic-cholangiocarcinoma': '#fde4ea', 'Squamous-': '#c8691d', 'Adenomatous': '#3872d1', 'Large-cell': '#000646', 'Squamous': '#9f79c4', 'Pleiomorphic': '#c53426', 'normal-pancreas/mucinous-cystic-neoplasia-': '#3b9249', 'normal-pancreas/choledochal-neuroendocrine-tumors': '#0b4887', 'normal-pancreas/solid-pseudopapillary-tumor': '#87a507', 'normal-pancreas/small intestine papillary adenocarinoma': '#163502', 'normal-pancreas/duodenal-intraepithelial-neoplasia': '#b77609', 'normal-pancreas/pancratic-neuroendocrine-tumor': '#bdc979', 'normal-pancreas/serous-cystic-neoplasia': '#682404', 'moderately-poorly-differentiated-PDAC': '#5c1006', 'poorly-differentiated-PDAC': '#8a2706', 'well-differentiated-PDAC': '#8e6429', 'moderately-differentiated-PDAC': '#2bcb1d', 'well-moderately-differentiated-PDAC': '#4a452f', 'PDAC': '#5e8c36', 'bladder-urothelial-tumor': '#bb264f', 'control': '#6394f8', 'thyroid-cancer': '#91d27a', 'Adenocarcinoma': '#9d3c1f', 'Severe-intestinal-metaplasia-,-mild-atrophy,-no-dysplasia': '#9198b1' }, 'cancer_stage' : { 'IA': '#b8e64a', 'IB': '#e77800', 'IIA': '#a35700', 'IIIA': '#d0919e', 'IA3': '#f94f9d', 'III': '#32cbcf', 'II': '#be67ee', 'IIIB': '#f55347', 'IIB': '#2b5e29', 'normal': '#8a5504', 'high-grade': '#53cab9', 'low-grade': '#f02235', 'IVB': '#93c066', 'IVC': '#801cb8', 'I': '#296bf2', 'Invasive adenocarcarcinoma with mucinous and signet ring features': '#ab86fc', 'Diffuse poorly cohesive adenocarcinoma with signet ring features': '#5a68c0', 'Intestinal invasive adenocarcinoma ': '#d3fbab', 'Intestinal adenocarcinoma': '#6f2dc8', 'Mixed intestinal poorly cohesive adenocarcinoma with signet ring component': '#4cd963' }, 'sampling_site' : { 'normal tissue adjacent to neoplasm ': '#178da0', 'normal tissue adjacent to neoplasm': '#9aec7c', 'neoplasm': '#72f6e3', 'neoplasm core': '#a9b77f', 'neoplasm border': '#9b7baf', 'nLung': '#8efdde', 'tLung': '#ea89a5', 'normal': '#663536', 'tumor': '#747294', 'core': '#2bbc14', 'middle': '#9375c1', 'edge': '#5ed157', 'tail': '#855b8d', 'common bile duct': '#68beba', 'body': '#861ce2', 'descending duodenum': '#c2482e', 'body and tail': '#0302b6', 'uncinate process': '#049734', 'head': '#814130', 'adjacent normal mucosae': '#7ddc1f', 'GEJ+stomach': '#0cbda0', 'Body ': '#e85033', 'Gastric': '#062052', 'Body and antrum invovled': '#131ccc', 'GEJ': '#b098db', 'lower esophagus: center is 0.2 cm above GEJ': '#21de80', 'lower esophagus: center is 0.3 cm above GEJ': '#5e83e9', 'Cardia GEJ': '#8b4e90', 'Body lesser curve': '#cd558d' }, 'cell_anno_detailed' : {'plasma cell (PC)': '#36d8c8', 'lymphoid cells (LC)': '#d5570e', 'tumor/adjacent confined suppressive dendrite cells (suppressive DC)': '#840627', 'cancerous/normal epithelial cells (EP)': '#975314', 'myeloid cells (MC)': '#bbc8c9', 'APOE+ tumor associated macrophage (APOE+ TAM)': '#c3917e', 'normal fibroblasts (NF)': '#73e105', 'normal endothelial cells (NEC)': '#a949e0', 'cancer-associated myofibroblasts (CAF_myo)': '#42cfb7', 'antigen-presenting fibroblasts (CAF_api)': '#b54752', 'fibroblast-like peripheral nerve cells (CAF_PN)': '#15b783', 'tumor endothelial cells (TEC)': '#9f2b4a', 'adipogenic CAF (CAF_adi)': '#a9bd97', 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)': '#1567b5', 'endothelial cells (EC)': '#b085b2', 'inflammatory CAF (CAF_infla)': '#c5cc9b', 'FABP4+ macrophage (FABP4+ MP)': '#6fec08', 'plasmacytoid DCs (pDC)': '#3c0840', 'discarded (discarded)': '#9e8ab6'}, 'cell_anno_abbreviation' : {'PC': '#36d8c8', 'LC': '#d5570e', 'suppressive DC': '#840627', 'EP': '#975314', 'MC': '#bbc8c9', 'APOE+ TAM': '#c3917e', 'NF': '#73e105', 'NEC': '#a949e0', 'CAF_myo': '#42cfb7', 'CAF_api': '#b54752', 'CAF_PN': '#15b783', 'TEC': '#9f2b4a', 'CAF_adi': '#a9bd97', 'CAF_EndoMT': '#1567b5', 'EC': '#b085b2', 'CAF_infla': '#c5cc9b', 'FABP4+ MP': '#6fec08', 'pDC': '#3c0840', 'discarded': '#9e8ab6'} },
+        'data_SF1G' : { 'seurat_clusters' : { '5' : '#EB977B', '1' : '#DA4C38', '2' : '#4DB1C9', '3' : '#01A07E', '4' : '#3F5285', '6' : '#858BAC', '7' : '#88C8B8', '8' : '#D01010' } },
+        'data_SF3A' : { 'cell_anno_subclustering' : { 'TIM3+ NKC' : '#3F5660', 'CD8+ CTL' : '#8E94B4', 'CD160+ NKC' : '#E1A063', 'CD8+ TEM' : '#D44F39', 'CD8+ TEM' : '#D44F39', 'CD8+ TEM' : '#D44F39', 'CD8+ TEM' : '#D44F39', 'DN T' : '#EDA289', 'CD4+ TCM' : '#58B5C8', 'CD4+ TCM' : '#58B5C8', 'Treg' : '#1B977F', 'Cycling NKC' : '#957D65', 'Cycling CD8+ T' : '#C61A1F', 'Cycling CD4+ T' : '#4F5C7A', 'PDCD1+ CD8+ T' : '#9BD0C3' } },
+        'data_F2F' : { 'state_detailed' : { 'CAF_State_1' : '#F4922D', 'CAF_State_2' : '#058445', 'CAF_State_3' : '#334684' }, 'cell_anno_detailed' : { 'cancer-associated myofibroblasts (CAF_myo)' : '#D45F41', 'inflammatory CAF (CAF_infla)' : '#48B3CD', 'adipogenic CAF (CAF_adi)' : '#36A787', 'normal fibroblasts (NF)' : '#4F5D88' }, },
+        'data_F5D' : { 'state' : { '1': '#fac1a2', '7': '#c03f39', '6': '#0ab397', '2': '#f63d17', '4': '#481f7d', '5': '#dac787', '3': '#7f37d9' }, 'cell_anno_detailed' : { 'cancer-associated myofibroblasts (CAF_myo)' : '#3A5082', 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)' : '#4BB1C9', 'tumor endothelial cells (TEC)' : '#EA967C' }, },
+        'data_F4D' : { 'state' : {'5': '#713f99', '3': '#1eb70a', '4': '#f58ccf', '1': '#be927f', '2': '#d14dcf' }, 'cell_anno_detailed' : { 'cancer-associated myofibroblasts (CAF_myo)' : '#3A5082', 'APOE+ tumor associated macrophage (APOE+ TAM)' : '#4BB1C9', 'antigen-presenting fibroblasts (CAF_api)' : '#EA967C' }, },
+    }; // define color for each cell type // currently color and cluster annotation for c0, c1, c2 are uncertain (need to receive a correct Rds file)
+//     object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_color = { 'all' : { 'name_cluster' : { 'c1' : '#7FC2E9', 'c2' : '#77A0D4', 'c3' : '#4F91C0', 'c4' : '#4586B3', 'c5' : '#3589B4', 'c6' : '#146AA5', 'c7' : '#156BA1', 'c8' : '#0B5687', 'c9' : '#F4F4C1', 'c10' : '#EFE6A3', 'c11' : '#F7DD90', 'c12' : '#F4BE51', 'c13' : '#F2942F', 'c14' : '#E16C1A', 'c15' : '#C14D1D', 'c16' : '#862F21', 'c17' : '#5E2014', 'c18' : '#8892BF', 'c19' : '#9D86B5', 'c20' : '#9175B3', 'c21' : '#805FA6', 'c22' : '#7F3E93', 'c23' : '#791C74', 'c24' : '#431F45', 'c25' : '#56B091', 'c26' : '#4BB355', 'c27' : '#1C8544', 'c28' : '#136A36', 'c29' : '#02351B', 'c30' : '#935424', 'c31' : '#B7761C', 'c32' : '#B99132', 'c33' : '#A88937', 'c34' : '#9D733F', 'c35' : '#A9A9A9', 'discarded' : '#A9A9A9' }, 'cell_type' : { 'Endothelium' : '#D9CD97', 'Epithelium' : '#C55044', 'Fibroblast' : '#6F89A8', 'Lymphocyte' : '#556F60', 'Myeloid' : '#534C7D', 'Plasma' : '#8A7148' }, 'group' : { 'Normal' : '#805FA6', 'Adjacent' : '#4F91C0', 'Tumor' : '#F2942F' }, 'tissue' : { 'lung' : '#54A894', 'PDAC' : '#9ACFC2', 'Bladder' : '#B7A48F', 'colorectal' : '#ECA289', 'thyroid' : '#8B6F57', 'gastric' : '#DD6043', 'breast' : '#515F8C', 'prostate' : '#D23B27', 'ICC' : '#68B9CE', 'ovarian' : '#8E98B6', 'liver' : '#68B9CE' }, 'gender' : { 'F': '#8774c2', 'M': '#e44a1b' }, 'disease' : { 'prostate-cancer': '#401a51', 'ovarian-cancer': '#5e195b', 'breast-cancer': '#4c3adf', 'colorectal-cancer': '#87537a', 'Pca': '#2c5f9d', 'ADC': '#77c425', 'ADC(Double)': '#b42e9a', 'Intrahepatic-cholangiocarcinoma': '#fde4ea', 'Squamous-': '#c8691d', 'Adenomatous': '#3872d1', 'Large-cell': '#000646', 'Squamous': '#9f79c4', 'Pleiomorphic': '#c53426', 'normal-pancreas/mucinous-cystic-neoplasia-': '#3b9249', 'normal-pancreas/choledochal-neuroendocrine-tumors': '#0b4887', 'normal-pancreas/solid-pseudopapillary-tumor': '#87a507', 'normal-pancreas/small intestine papillary adenocarinoma': '#163502', 'normal-pancreas/duodenal-intraepithelial-neoplasia': '#b77609', 'normal-pancreas/pancratic-neuroendocrine-tumor': '#bdc979', 'normal-pancreas/serous-cystic-neoplasia': '#682404', 'moderately-poorly-differentiated-PDAC': '#5c1006', 'poorly-differentiated-PDAC': '#8a2706', 'well-differentiated-PDAC': '#8e6429', 'moderately-differentiated-PDAC': '#2bcb1d', 'well-moderately-differentiated-PDAC': '#4a452f', 'PDAC': '#5e8c36', 'bladder-urothelial-tumor': '#bb264f', 'control': '#6394f8', 'thyroid-cancer': '#91d27a', 'Adenocarcinoma': '#9d3c1f', 'Severe-intestinal-metaplasia-,-mild-atrophy,-no-dysplasia': '#9198b1' }, 'cancer_stage' : { 'IA': '#b8e64a', 'IB': '#e77800', 'IIA': '#a35700', 'IIIA': '#d0919e', 'IA3': '#f94f9d', 'III': '#32cbcf', 'II': '#be67ee', 'IIIB': '#f55347', 'IIB': '#2b5e29', 'normal': '#8a5504', 'high-grade': '#53cab9', 'low-grade': '#f02235', 'IVB': '#93c066', 'IVC': '#801cb8', 'I': '#296bf2', 'Invasive adenocarcarcinoma with mucinous and signet ring features': '#ab86fc', 'Diffuse poorly cohesive adenocarcinoma with signet ring features': '#5a68c0', 'Intestinal invasive adenocarcinoma ': '#d3fbab', 'Intestinal adenocarcinoma': '#6f2dc8', 'Mixed intestinal poorly cohesive adenocarcinoma with signet ring component': '#4cd963' }, 'sampling_site' : { 'normal tissue adjacent to neoplasm ': '#178da0', 'normal tissue adjacent to neoplasm': '#9aec7c', 'neoplasm': '#72f6e3', 'neoplasm core': '#a9b77f', 'neoplasm border': '#9b7baf', 'nLung': '#8efdde', 'tLung': '#ea89a5', 'normal': '#663536', 'tumor': '#747294', 'core': '#2bbc14', 'middle': '#9375c1', 'edge': '#5ed157', 'tail': '#855b8d', 'common bile duct': '#68beba', 'body': '#861ce2', 'descending duodenum': '#c2482e', 'body and tail': '#0302b6', 'uncinate process': '#049734', 'head': '#814130', 'adjacent normal mucosae': '#7ddc1f', 'GEJ+stomach': '#0cbda0', 'Body ': '#e85033', 'Gastric': '#062052', 'Body and antrum invovled': '#131ccc', 'GEJ': '#b098db', 'lower esophagus: center is 0.2 cm above GEJ': '#21de80', 'lower esophagus: center is 0.3 cm above GEJ': '#5e83e9', 'Cardia GEJ': '#8b4e90', 'Body lesser curve': '#cd558d' }, 'cell_anno_detailed' : {'plasma cell (PC)': '#36d8c8', 'lymphoid cells (LC)': '#d5570e', 'tumor/adjacent confined suppressive dendrite cells (suppressive DC)': '#840627', 'cancerous/normal epithelial cells (EP)': '#975314', 'myeloid cells (MC)': '#bbc8c9', 'APOE+ tumor associated macrophage (APOE+ TAM)': '#c3917e', 'normal fibroblasts (NF)': '#73e105', 'normal endothelial cells (NEC)': '#a949e0', 'cancer-associated myofibroblasts (CAF_myo)': '#42cfb7', 'antigen-presenting fibroblasts (CAF_api)': '#b54752', 'fibroblast-like peripheral nerve cells (CAF_PN)': '#15b783', 'tumor endothelial cells (TEC)': '#9f2b4a', 'adipogenic CAF (CAF_adi)': '#a9bd97', 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)': '#1567b5', 'endothelial cells (EC)': '#b085b2', 'inflammatory CAF (CAF_infla)': '#c5cc9b', 'FABP4+ macrophage (FABP4+ MP)': '#6fec08', 'plasmacytoid DCs (pDC)': '#3c0840', 'discarded (discarded)': '#9e8ab6'}, 'cell_anno_abbreviation' : {'PC': '#36d8c8', 'LC': '#d5570e', 'suppressive DC': '#840627', 'EP': '#975314', 'MC': '#bbc8c9', 'APOE+ TAM': '#c3917e', 'NF': '#73e105', 'NEC': '#a949e0', 'CAF_myo': '#42cfb7', 'CAF_api': '#b54752', 'CAF_PN': '#15b783', 'TEC': '#9f2b4a', 'CAF_adi': '#a9bd97', 'CAF_EndoMT': '#1567b5', 'EC': '#b085b2', 'CAF_infla': '#c5cc9b', 'FABP4+ MP': '#6fec08', 'pDC': '#3c0840', 'discarded': '#9e8ab6'} } }; // define color for each cell type // currently color and cluster annotation for c0, c1, c2 are uncertain (need to receive a correct Rds file)
     // number of cells for each class
-    object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_num_cells = { 'All' : {'group': {'Tumor': 528811, 'Normal': 162627, 'Adjacent': 146950}, 'tissue': {'lung': 207411, 'PDAC': 165197, 'bladder': 85384, 'colorectal': 62203, 'thyroid': 60768, 'gastric': 59874, 'breast': 43751, 'prostate': 43193, 'ICC': 42609, 'ovarian': 41094, 'liver': 26904}, 'cell_type': {'Epithelium': 268469, 'Lymphocyte': 202077, 'Myeloid': 151298, 'Fibroblast': 104804, 'Endothelium': 74102, 'Plasma': 37638}, 'name_cluster': {'c35': 268469, 'c18': 41108, 'c9': 36175, 'c10': 35815, 'c11': 32858, 'c19': 32218, 'c12': 29697, 'c1': 28802, 'c25': 27011, 'c20': 23737, 'c2': 22889, 'c21': 22059, 'c26': 21615, 'c13': 19824, 'c3': 19059, 'c22': 17650, 'c4': 16164, 'c14': 16008, 'c27': 15036, 'c5': 14742, 'c23': 12981, 'c15': 12052, 'c16': 11504, 'c28': 10392, 'c17': 8144, 'c29': 8057, 'c30': 7585, 'c31': 6537, 'c32': 6257, 'c33': 4982, 'c34': 4220, 'c24': 1545, 'c6': 1363, 'c7': 1186, 'c8': 487, 'discarded': 160}, 'disease': {'na': 162627, 'ADC': 75298, 'thyroid-cancer': 46623, 'moderately-poorly-differentiated-PDAC': 44114, 'breast-cancer': 43751, 'bladder-urothelial-tumor': 43681, 'Intrahepatic-cholangiocarcinoma': 42609, 'ovarian-cancer': 41094, 'colorectal-cancer': 39954, 'Adenomatous': 39450, 'Adenocarcinoma': 33632, 'prostate-cancer': 30711, 'moderately-differentiated-PDAC': 22393, 'Large-cell': 18878, 'normal-pancreas/solid-pseudopapillary-tumor': 15739, 'control': 14737, 'Pleiomorphic': 14640, 'normal-pancreas/mucinous-cystic-neoplasia-': 13485, 'well-moderately-differentiated-PDAC': 13042, 'ADC(Double)': 12360, 'poorly-differentiated-PDAC': 9765, 'well-differentiated-PDAC': 8378, 'PDAC': 7727, 'Pca': 7316, 'Squamous': 6271, 'normal-pancreas/small intestine papillary adenocarinoma': 5924, 'normal-pancreas/pancratic-neuroendocrine-tumor': 5049, 'Severe-intestinal-metaplasia-,-mild-atrophy,-no-dysplasia': 4671, 'Squamous-': 4153, 'normal-pancreas/choledochal-neuroendocrine-tumors': 4140, 'normal-pancreas/serous-cystic-neoplasia': 3570, 'normal-pancreas/duodenal-intraepithelial-neoplasia': 2606}, 'cancer_stage': {'na': 335778, 'IIB': 68595, 'normal': 65250, 'IB': 59152, 'II': 52523, 'IA': 47969, 'III': 37532, 'IA3': 27347, 'IIIA': 26514, 'high-grade': 23824, 'IIA': 22320, 'low-grade': 19857, 'IIIB': 14792, 'Intestinal invasive adenocarcinoma ': 9389, 'Diffuse poorly cohesive adenocarcinoma with signet ring features': 6101, 'Invasive adenocarcarcinoma with mucinous and signet ring features': 5774, 'I': 5128, 'Intestinal adenocarcinoma': 3443, 'Mixed intestinal poorly cohesive adenocarcinoma with signet ring component': 3271, 'IVB': 2378, 'IVC': 1451}, 'gender': {'na': 328266, 'F': 293731, 'M': 216391}, 'sampling_site': {'na': 239961, 'neoplasm': 128818, 'head': 47679, 'tLung': 44778, 'nLung': 42880, 'normal': 39416, 'body': 30175, 'tumor': 28665, 'body and tail': 25694, 'normal tissue adjacent to neoplasm': 21329, 'edge': 20828, 'middle': 19445, 'core': 17647, 'tail': 17518, 'adjacent normal mucosae': 14737, 'neoplasm core': 14664, 'uncinate process': 14469, 'neoplasm border': 12781, 'descending duodenum': 8530, 'Gastric': 8513, 'Body ': 6101, 'normal tissue adjacent to neoplasm ': 5931, 'GEJ+stomach': 5774, 'Body lesser curve': 4671, 'lower esophagus: center is 0.3 cm above GEJ': 4241, 'common bile duct': 4140, 'Body and antrum invovled': 3443, 'GEJ': 3271, 'lower esophagus: center is 0.2 cm above GEJ': 1413, 'Cardia GEJ': 876}, 'cell_anno_detailed' : { 'cancerous/normal epithelial cells (EP)' : 268469, 'lymphoid cells (LC)' : 202077, 'myeloid cells (MC)' : 71739, 'plasma cell (PC)' : 37638, 'normal fibroblasts (NF)' : 33801, 'APOE+ tumor associated macrophage (APOE+ TAM)' : 32218, 'normal endothelial cells (NEC)' : 32007, 'cancer-associated myofibroblasts (CAF_myo)' : 28802, 'tumor endothelial cells (TEC)' : 27011, 'FABP4+ macrophage (FABP4+ MP)' : 23737, 'inflammatory CAF (CAF_infla)' : 22889, 'tumor/adjacent confined suppressive dendrite cells (suppressive DC)' : 22059, 'adipogenic CAF (CAF_adi)' : 16164, 'endothelial cells (EC)' : 15036, 'plasmacytoid DCs (pDC)' : 1545, 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)' : 1363, 'fibroblast-like peripheral nerve cells (CAF_PN)' : 1186, 'antigen-presenting fibroblasts (CAF_api)' : 487, 'discarded (discarded)' : 160 } } }
+    object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_num_cells = {'all': {'group': {'Tumor': 528811, 'Normal': 162627, 'Adjacent': 146950}, 'tissue': {'lung': 207411, 'PDAC': 165197, 'bladder': 85384, 'colorectal': 62203, 'thyroid': 60768, 'gastric': 59874, 'breast': 43751, 'prostate': 43193, 'ICC': 42609, 'ovarian': 41094, 'liver': 26904}, 'cell_type': {'Epithelium': 268469, 'Lymphocyte': 202077, 'Myeloid': 151298, 'Fibroblast': 104804, 'Endothelium': 74102, 'Plasma': 37638}, 'name_cluster': {'c35': 268469, 'c18': 41108, 'c9': 36175, 'c10': 35815, 'c11': 32858, 'c19': 32218, 'c12': 29697, 'c1': 28802, 'c25': 27011, 'c20': 23737, 'c2': 22889, 'c21': 22059, 'c26': 21615, 'c13': 19824, 'c3': 19059, 'c22': 17650, 'c4': 16164, 'c14': 16008, 'c27': 15036, 'c5': 14742, 'c23': 12981, 'c15': 12052, 'c16': 11504, 'c28': 10392, 'c17': 8144, 'c29': 8057, 'c30': 7585, 'c31': 6537, 'c32': 6257, 'c33': 4982, 'c34': 4220, 'c24': 1545, 'c6': 1363, 'c7': 1186, 'c8': 487, 'discarded': 160}, 'disease': {'na': 162627, 'ADC': 75298, 'thyroid-cancer': 46623, 'moderately-poorly-differentiated-PDAC': 44114, 'breast-cancer': 43751, 'bladder-urothelial-tumor': 43681, 'Intrahepatic-cholangiocarcinoma': 42609, 'ovarian-cancer': 41094, 'colorectal-cancer': 39954, 'Adenomatous': 39450, 'Adenocarcinoma': 33632, 'prostate-cancer': 30711, 'moderately-differentiated-PDAC': 22393, 'Large-cell': 18878, 'normal-pancreas/solid-pseudopapillary-tumor': 15739, 'control': 14737, 'Pleiomorphic': 14640, 'normal-pancreas/mucinous-cystic-neoplasia-': 13485, 'well-moderately-differentiated-PDAC': 13042, 'ADC(Double)': 12360, 'poorly-differentiated-PDAC': 9765, 'well-differentiated-PDAC': 8378, 'PDAC': 7727, 'Pca': 7316, 'Squamous': 6271, 'normal-pancreas/small intestine papillary adenocarinoma': 5924, 'normal-pancreas/pancratic-neuroendocrine-tumor': 5049, 'Severe-intestinal-metaplasia-,-mild-atrophy,-no-dysplasia': 4671, 'Squamous-': 4153, 'normal-pancreas/choledochal-neuroendocrine-tumors': 4140, 'normal-pancreas/serous-cystic-neoplasia': 3570, 'normal-pancreas/duodenal-intraepithelial-neoplasia': 2606}, 'cancer_stage': {'na': 335778, 'IIB': 68595, 'normal': 65250, 'IB': 59152, 'II': 52523, 'IA': 47969, 'III': 37532, 'IA3': 27347, 'IIIA': 26514, 'high-grade': 23824, 'IIA': 22320, 'low-grade': 19857, 'IIIB': 14792, 'Intestinal invasive adenocarcinoma ': 9389, 'Diffuse poorly cohesive adenocarcinoma with signet ring features': 6101, 'Invasive adenocarcarcinoma with mucinous and signet ring features': 5774, 'I': 5128, 'Intestinal adenocarcinoma': 3443, 'Mixed intestinal poorly cohesive adenocarcinoma with signet ring component': 3271, 'IVB': 2378, 'IVC': 1451}, 'gender': {'na': 328266, 'F': 293731, 'M': 216391}, 'sampling_site': {'na': 239961, 'neoplasm': 128818, 'head': 47679, 'tLung': 44778, 'nLung': 42880, 'normal': 39416, 'body': 30175, 'tumor': 28665, 'body and tail': 25694, 'normal tissue adjacent to neoplasm': 21329, 'edge': 20828, 'middle': 19445, 'core': 17647, 'tail': 17518, 'adjacent normal mucosae': 14737, 'neoplasm core': 14664, 'uncinate process': 14469, 'neoplasm border': 12781, 'descending duodenum': 8530, 'Gastric': 8513, 'Body ': 6101, 'normal tissue adjacent to neoplasm ': 5931, 'GEJ+stomach': 5774, 'Body lesser curve': 4671, 'lower esophagus: center is 0.3 cm above GEJ': 4241, 'common bile duct': 4140, 'Body and antrum invovled': 3443, 'GEJ': 3271, 'lower esophagus: center is 0.2 cm above GEJ': 1413, 'Cardia GEJ': 876}, 'cell_anno_detailed': {'cancerous/normal epithelial cells (EP)': 268469, 'lymphoid cells (LC)': 202077, 'myeloid cells (MC)': 71739, 'plasma cell (PC)': 37638, 'normal fibroblasts (NF)': 33801, 'APOE+ tumor associated macrophage (APOE+ TAM)': 32218, 'normal endothelial cells (NEC)': 32007, 'cancer-associated myofibroblasts (CAF_myo)': 28802, 'tumor endothelial cells (TEC)': 27011, 'FABP4+ macrophage (FABP4+ MP)': 23737, 'inflammatory CAF (CAF_infla)': 22889, 'tumor/adjacent confined suppressive dendrite cells (suppressive DC)': 22059, 'adipogenic CAF (CAF_adi)': 16164, 'endothelial cells (EC)': 15036, 'plasmacytoid DCs (pDC)': 1545, 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)': 1363, 'fibroblast-like peripheral nerve cells (CAF_PN)': 1186, 'antigen-presenting fibroblasts (CAF_api)': 487, 'discarded (discarded)': 160}}, 'data_SF1G': {'seurat_clusters': {0: 5485, 1: 5093, 2: 3040, 3: 1928, 4: 1413, 5: 960, 6: 901, 7: 766}}, 'data_SF3A': {'seurat_clusters': {0: 28703, 1: 17953, 2: 15693, 3: 15316, 4: 14923, 5: 14105, 6: 13776, 7: 12742, 8: 11672, 9: 10098, 10: 8716, 11: 7115, 12: 3747, 14: 2257, 16: 514}, 'cell_anno_subclustering': {'CD8+ TEM': 63196, 'CD4+ TCM': 30695, 'DN T': 15693, 'Treg': 14923, 'TIM3+ NKC': 13776, 'CD8+ CTL': 10098, 'CD160+ NKC': 7115, 'Cycling CD8+ T': 3747, 'Cycling CD4+ T': 2257, 'Cycling NKC': 514}}, 'data_F5D': {'state': {1: 1994, 4: 1962, 5: 1587, 7: 1067, 6: 483, 2: 234, 3: 36}}, 'data_F4D': {'state': {3: 490, 5: 429, 2: 274, 1: 261, 4: 33}}, 'data_F2F': {'state_detailed': {'CAF_State_3': 2891, 'CAF_State_2': 2476, 'CAF_State_1': 2133}}};
     
     async function PlotCellAnnotation( flag_restyle = false ) { // draw a new plot by default
-        let str_tissue = object_data.main.umap.tissue, // retrieve current tissue
+        let str_dataset = object_data.main.umap.dataset, // retrieve current tissue
             option_selected = Select_Get_Selected_Option_Using_ID( "select_umap_annotation_data" ),
             str_name_data_annotation = option_selected.value, // retrieve name of data for annotations
             str_name_option_selected = option_selected.innerHTML; // retrieve the name of the selected option
@@ -2312,26 +2380,45 @@ var DragSort=function(t){
         // demonstration
         let object_cache = object_data.main.gene.expr;
         let dictarr = object_data.main.umap.dictarr, 
-            col_name_cell_type = ( object_data.main.umap.flag_all_tissues ) ? 'cell_type' : 'tissue_cell_type',
+            col_name_cell_type = ( object_data.main.umap.flag_all_cells_are_used ) ? 'cell_type' : 'tissue_cell_type',
             l_color = [ ], marker_colormap = { }, str_hovertemplate_additional_line = '';
         // set color 
         switch( str_name_data_annotation ) {
-          case 'cell_anno_detailed' :
-          case 'name_cluster':
-          case 'cell_type':
-          case 'gender':
-          case 'disease':
-          case 'cancer_stage':
-          case 'sampling_site':
-          case 'tissue':
-          case 'group':
-            l_color = ArrayMap( dictarr[ str_name_data_annotation ], object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_color[ str_tissue ][ str_name_data_annotation ], '#A9A9A9' ); // default color is '#A9A9A9'
-            break;
-          default: // by default shows color based on continuous values
-            l_color = dictarr[ str_name_data_annotation ];
-            marker_colormap = { showscale: true, colorscale: "YlOrRd", reversescale: true }; // setting for showing colormap
-            str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <b>%{marker.color:." + ( ( str_name_option_selected == 'MT Percentage' ) ? 1 : 0 ).toString( ) + "f}</b><br>"; // only MT percentage data will be shown as floating point numbers
-            break;
+            case 'cell_anno_detailed' :
+            case 'name_cluster':
+            case 'cell_type':
+            case 'gender':
+            case 'disease':
+            case 'cancer_stage':
+            case 'sampling_site':
+            case 'tissue':
+            case 'group':
+            case 'seurat_clusters' :
+            case 'cell_anno_subclustering' :
+            case 'state_detailed' :
+            case 'state' :
+                let str_dataset_default = 'all', // set default dataset for mapping colors
+                    dict_dataset_to_dict_color = object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_color,
+                    dict_color = { }; 
+                if ( str_dataset in dict_dataset_to_dict_color ) {
+                    dict_color = dict_dataset_to_dict_color[ str_dataset ];
+                } else {
+                    dict_color = dict_dataset_to_dict_color[ str_dataset_default ];
+                }
+                // if current dict_color lack color data for the current column, use the data of the default dataset
+                if ( ! ( str_name_data_annotation in dict_color ) ) {
+                    dict_color = dict_dataset_to_dict_color[ str_dataset_default ]; // if the column name is not set for the current dataset, use the color of the default dataset
+                }
+                object_data.main.umap.dict_color_anno = dict_color[ str_name_data_annotation ]; // update colors of the current annotation
+                console.log( str_name_data_annotation, dict_color ); 
+                l_color = ArrayMap( dictarr[ str_name_data_annotation ], object_data.main.umap.dict_color_anno, '#A9A9A9' ); // default color is '#A9A9A9'
+                str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <b>%{marker.color:." + ( ( str_name_option_selected in { 'Pseudotime' : true, 'MT Percentage' : true } ) ? 2 : 0 ).toString( ) + "f}</b><br>"; // only MT percentage data will be shown as floating point numbers
+                break;
+            default: // by default shows color based on continuous values
+                l_color = dictarr[ str_name_data_annotation ];
+                marker_colormap = { showscale: true, colorscale: "YlOrRd", reversescale: true }; // setting for showing colormap
+                str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <b>%{marker.color:." + ( ( str_name_option_selected in { 'Pseudotime' : true, 'MT Percentage' : true } ) ? 2 : 0 ).toString( ) + "f}</b><br>"; // only MT percentage data will be shown as floating point numbers
+                break;
         }
         // update x-axis values from gene expression data
         if ( object_data.main.scatter.x_axis_col_name == '__x_axis_gene_expr__' ) {
@@ -2339,24 +2426,24 @@ var DragSort=function(t){
                 l_expr_x_axis = [ ];
             await UpdateCache( object_cache, preprocess_expr, [ gene_symbol_x_axis ] ); // retrieve the single cells expression data of the current gene.
             l_expr_x_axis = object_data.main.gene.expr.data[ gene_symbol_x_axis ].data;
-            if ( ! object_data.main.umap.flag_all_tissues ) {
+            if ( ! object_data.main.umap.flag_all_cells_are_used ) {
                 l_expr_x_axis = ArrayBooleanIndexing( l_expr_x_axis, object_data.main.umap.l_bool_index_tissue );
             }
             dictarr[ '__x_axis_gene_expr__' ] = l_expr_x_axis;
         } else {
-            object_data.main.scatter.x_axis_col_name = ( object_data.main.umap.flag_all_tissues ) ? 'UMAP_1' : 'tissue_UMAP_1';
+            object_data.main.scatter.x_axis_col_name = ( object_data.main.umap.flag_all_cells_are_used ) ? 'UMAP_1' : 'tissue_UMAP_1';
         }
         if ( object_data.main.scatter.y_axis_col_name == '__y_axis_gene_expr__' ) {
             let gene_symbol_y_axis = object_data.main.scatter.y_axis_option,
                 l_expr_y_axis = [ ];
             await UpdateCache( object_cache, preprocess_expr, [ gene_symbol_y_axis ] ); // retrieve the single cells expression data of the current gene.
             l_expr_y_axis = object_data.main.gene.expr.data[ gene_symbol_y_axis ].data;
-            if ( ! object_data.main.umap.flag_all_tissues ) {
+            if ( ! object_data.main.umap.flag_all_cells_are_used ) {
                 l_expr_y_axis = ArrayBooleanIndexing( l_expr_y_axis, object_data.main.umap.l_bool_index_tissue );
             }
             dictarr[ '__y_axis_gene_expr__' ] = l_expr_y_axis;
         }  else {
-            object_data.main.scatter.y_axis_col_name = ( object_data.main.umap.flag_all_tissues ) ? 'UMAP_2' : 'tissue_UMAP_2';
+            object_data.main.scatter.y_axis_col_name = ( object_data.main.umap.flag_all_cells_are_used ) ? 'UMAP_2' : 'tissue_UMAP_2';
         }
         // complete the selection process by re-enabling the selection button
         $id( 'select_scatter_x_axis' ).disabled = false; 
@@ -2521,21 +2608,21 @@ var DragSort=function(t){
         "Thymus (n=2914)" : "#F564E3",
     }; // define color for each tissue
     function SortBoxTrace( trace_a, trace_b ) { return - ( trace_a.q3 - trace_b.q3 ) } // Sort Plotly Boxplot traces based on parameter values
-    object_data.main.preview_gene = { previous : { str_tissue : 'All', str_name_data_annotation : 'default', gene_symbol : 'default' } };
+    object_data.main.preview_gene = { previous : { str_dataset : 'all', str_name_data_annotation : 'default', gene_symbol : 'default' } };
     dict_name_adata_to_name_adata_for_box_plot_preview = { "1000cells_per_cluster" : "all", "2000cells_per_cluster" : "all", "5000cells_per_cluster" : "5000cells_per_cluster", "all" : "all", "data_SF1G" : "data_SF1G", "data_SF3A" : "data_SF3A", "fibroblast" : "all", "data_F5D" : "data_F5D", "data_F4D" : "data_F4D", "data_F2F" : "data_F2F" } // map name_adata used in the box plot gene expression preview graph for each name_adata
     async function PreviewGene( gene_symbol ) { // draw preview of expression of the current gene using boxplots
         // retrieve str_name_data_annotation from the current setting
         let str_name_data_annotation = object_data.main.umap.str_name_data_annotation,
-            str_tissue = object_data.main.umap.tissue,
+            str_dataset = object_data.main.umap.dataset,
             previous = object_data.main.preview_gene.previous;
         
         // determine whether the plot should be drawn again
-        if ( ( previous.str_tissue == str_tissue ) & ( previous.str_name_data_annotation == str_name_data_annotation ) & ( previous.gene_symbol == gene_symbol ) ) {
+        if ( ( previous.str_dataset == str_dataset ) & ( previous.str_name_data_annotation == str_name_data_annotation ) & ( previous.gene_symbol == gene_symbol ) ) {
             console.log( '[PreviewGene] preview gene has been already drawn' );
             return - 1;
         }
         // save the current setting before drawing the graph
-        object_data.main.preview_gene.previous = { str_tissue : str_tissue, str_name_data_annotation : str_name_data_annotation, gene_symbol : gene_symbol }
+        object_data.main.preview_gene.previous = { str_dataset : str_dataset, str_name_data_annotation : str_name_data_annotation, gene_symbol : gene_symbol }
         
         let window_width = window.innerWidth,
             window_height = window.innerHeight,
@@ -2549,7 +2636,7 @@ var DragSort=function(t){
         // load and initialize box plot data 
         if ( ! ( 'gene_summary' in object_data.main ) || str_name_data_annotation != object_data.main.gene_summary.str_name_data_annotation ) { // if box plot data has not been parsed or annotation data has been changed, initialize the data
             // update box plot data if the given 'str_name_data_annotation' is valid
-            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '' } ) {
+            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '', 'cell_anno_subclustering' : '', 'seurat_clusters' : '', 'seurat_clusters' : '', 'state_detailed' : '', 'state' : '' } ) {
                 let name_file_box_plot_summary = "box_precomputed." + dict_name_adata_to_name_adata_for_box_plot_preview[ object_data.main.name_adata ] + ".multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
                 await LoadRemoteData( [ object_data.file.base_url + name_file_box_plot_summary ] );
                 object_data.main.gene_summary = { };
@@ -2570,7 +2657,7 @@ var DragSort=function(t){
             trace.q3 = [ dictdictarr[ category ][ 'Q3' ][ index_gene ] / 1000 ];
             trace.upperfence = [ dictdictarr[ category ][ 'MAX' ][ index_gene ] / 1000 ];
             trace.name = category;
-            trace.line = { color: object_data.setting.plot.annotation.dict_tissue_to_dict_name_col_to_dict_class_to_color[ str_tissue ][ str_name_data_annotation ][ category_without_description ] }; // use pre-defined color for each tissue
+            trace.line = { color: object_data.main.umap.dict_color_anno[ category_without_description ] }; // use pre-defined color for each tissue
             trace.type = 'box';
             trace.x0 = category;
             l_trace.push( trace );
