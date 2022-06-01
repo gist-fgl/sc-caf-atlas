@@ -464,6 +464,8 @@ code {
             </div>
             <!-- sidebar-footer  -->
 <!--             <div class="sidebar-footer">
+            </div> -->
+<!--             <div class="sidebar-footer">
                 <div class="dropdown">
 
                     <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -612,6 +614,8 @@ code {
 <div id="application-current-view"> 
 <div id="single_cell_lncrna_database">
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-navbar"> <!-- sticky-top -->
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo_compact.png" class="d-block w-100 ml-auto mr-2" style="max-width: 80px; max-height: 80px !important;" alt="West China Hospital Logo">
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo_compact.jpg" class="w-100 ml-2 mr-auto" style="max-width: 80px; max-height: 80px !important;" alt="GIST Logo">
         <a class="navbar-brand mb-0 h1" href="https://gist-fgl.github.io/sc-caf-atlas/">Single Cell Cancer Associated Fibroblast Atlas</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav_top" aria-controls="navbarNav_top" aria-expanded="false" aria-label="Toggle top navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav_top">
@@ -799,6 +803,10 @@ code {
         </nav>
         <div id="container_datatable_correl"><table id="datatable_correl" class="display" width="100%"></table></div>
     </div>
+<!--     <div>
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo.png" class="w-100 mr-2 ml-auto" style="max-width: 100px; max-height: 100px !important;" alt="West China Hospital Logo">
+        <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.jpg" class="w-100 ml-2 mr-auto" style="max-width: 100px; max-height: 100px !important;" alt="GIST Logo">
+    </div> -->
 <!--     <div id="container_interaction_network" class="collapse">
         <nav class="navbar navbar-dark bg-custom-navbar">
             <a class="navbar-brand mb-0 h5">Data Tables</a>
@@ -974,10 +982,13 @@ code {
 
 <!--                 <h1 class="modal-title">Usages</h1> -->
 
-                <h5 class="text-muted" style="text-align:center;">Single-cell data analysis has been conducted by Dr. Han Luo at the West China Hospital, Sichuan universtiy. The web application has been developed by Hyunsu An at Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
+                
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">Start!</button>
+                <h5 class="text-muted" style="text-align:center;">Single-cell data analysis has been conducted by Dr. Han Luo at the West China Hospital, Sichuan universtiy. The web application has been developed by Hyunsu An at Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
+                <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo.png" class="d-block w-100 ml-auto mr-2" style="max-width: 200px; max-height: 250px !important;" alt="West China Hospital Logo">
+                <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.jpg" class="d-block w-100 ml-2 mr-auto" style="max-width: 230px; max-height: 230px !important;" alt="GIST Logo">
             </div>
         </div>
     </div>
@@ -1122,7 +1133,7 @@ var DragSort=function(t){
     window.addEventListener( "keyup", Record_KeyDown );
     window.addEventListener( "keypress", Record_KeyDown );
     window.addEventListener( "keydown", Record_KeyDown );
-    hotkeys( 'ctrl+d,ctrl+i,ctrl+u,ctrl+h,command+h,command+d,command+i,command+u', function ( event, handler ) {
+    hotkeys( 'ctrl+s,ctrl+t,ctrl+d,ctrl+i,ctrl+u,ctrl+h,command+s,command+t,command+h,command+d,command+i,command+u', function ( event, handler ) {
         event.preventDefault( );
         switch ( handler.key ) {
             case 'ctrl+s': 
@@ -2636,7 +2647,7 @@ var DragSort=function(t){
         // load and initialize box plot data 
         if ( ! ( 'gene_summary' in object_data.main ) || str_name_data_annotation != object_data.main.gene_summary.str_name_data_annotation ) { // if box plot data has not been parsed or annotation data has been changed, initialize the data
             // update box plot data if the given 'str_name_data_annotation' is valid
-            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '', 'cell_anno_subclustering' : '', 'seurat_clusters' : '', 'seurat_clusters' : '', 'state_detailed' : '', 'state' : '' } ) {
+            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '', 'cell_anno_subclustering' : '', 'seurat_clusters' : '', 'seurat_clusters' : '', 'state_detailed' : '', 'state' : '', 'gender' : '' } ) {
                 let name_file_box_plot_summary = "box_precomputed." + dict_name_adata_to_name_adata_for_box_plot_preview[ object_data.main.name_adata ] + ".multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
                 await LoadRemoteData( [ object_data.file.base_url + name_file_box_plot_summary ] );
                 object_data.main.gene_summary = { };
