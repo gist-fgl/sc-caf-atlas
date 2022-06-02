@@ -338,7 +338,8 @@ code {
     monospace;
 }
 .footer {
-  position: fixed;
+/*   position: fixed; */
+/*   for sticky footer   */
   left: 0;
   bottom: 0;
   width: 100%;
@@ -737,10 +738,11 @@ code {
                             <div class="btn-toolbar" role="toolbar">
                                 <div class="input-group mx-2 my-2">
                                     <div class="input-group-prepend"><span class="input-group-text">Plot height is</span></div>
-                                    <input type="text" class="form-control" aria-label="height of the plot in pixel" id="input_plot_height_violin" title="input field for setting the height of violin plots in pixels" value="1100">
+                                    <input type="text" class="form-control" aria-label="height of the plot in pixel" id="input_plot_height_violin" title="input field for setting the height of violin plots in pixels" value="450">
                                     <div class="input-group-append"><span class="input-group-text">pixels</span></div>
                                 </div>
                             </div>
+                            <h5 class="text-muted">plot all cells/cells with only positive counts</h5>
                             <div class="btn-toolbar" role="toolbar">
                                 <div class="input-group">
                                     <div class="form-check form-check-inline">
@@ -749,7 +751,25 @@ code {
                                 </div>
                             </div>
                         </p>
-                        <p><button type="button" class="btn btn-secondary btn-block mx-2 my-2" onclick="UpdateGene( );PlotCellAnnotation( );">Update Graphs</button></p>
+                        <p>
+                            <h5 class="text-muted">[Gene Preview] BoxPlot Setting</h5>
+                            <div class="btn-toolbar" role="toolbar">
+                                <div class="input-group mx-2 my-2">
+                                    <div class="input-group-prepend"><span class="input-group-text">Plot height is</span></div>
+                                    <input type="text" class="form-control" aria-label="height of the plot in pixel" id="input_plot_height_boxplot" title="input field for setting the height of the box plot (gene-preview) in pixels" value="auto">
+                                    <div class="input-group-append"><span class="input-group-text">pixels</span></div>
+                                </div>
+                            </div>
+                            <h5 class="text-muted">enable/disable preview</h5>
+                            <div class="btn-toolbar" role="toolbar">
+                                <div class="input-group">
+                                    <div class="form-check form-check-inline">
+                                        <input id="checkbox__plotly_sclncrna_expression_preview_boxplot_enable_disable" type="checkbox" checked data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="light" data-offstyle="secondary" data-size="sm" data-style="ios" data-width="150" onchange="PreviewGene( object_data.main.gene.gene_symbol )">
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                        <p><button type="button" class="btn btn-secondary btn-block mx-2 my-2" onclick="UpdateGene( );PlotCellAnnotation( );PreviewGene( object_data.main.gene.gene_symbol );">Update Graphs</button></p>
                     </div>
                 </div>
             </div>
@@ -769,10 +789,10 @@ code {
             </div>
         </div>
     </div>
-    <nav class="navbar navbar-dark bg-custom-navbar">
+    <nav class="navbar navbar-dark bg-custom-navbar" id="navbar_supplementary_graph_and_tables">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent_supplementary_graph_setting_panel" aria-controls="navbarToggleExternalContent_supplementary_graph_setting_panel" aria-expanded="false" aria-label="Toggle supplementary plot setting panel" data-tooltip="tooltip" data-placement="right" data-html="true" title="Press to <b>select or remove columns</b> in for <i>parallel coordinate graphs</i> for filtering cross-reactivity prediction data"><i class="material-icons icon-white" style="font-size:20px;cursor:pointer">settings</i></button>
         <form class="form-inline">
-			<button class="btn btn-light btn-sm mx-1 my-0" id="btn_violin_plot" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_sclncrna_expression_violin" aria-expanded="false" aria-controls="container_panel_sclncrna_expression_violin" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a collection of violin plots</i> displaying a distribution of gene expression values for each cell cluster" aria-label="">Violin Plot</button>
+            <button class="btn btn-light btn-sm mx-1 my-0" id="btn_violin_plot" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_sclncrna_expression_violin" aria-expanded="false" aria-controls="container_panel_sclncrna_expression_violin" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a collection of violin plots</i> displaying a distribution of gene expression values for each cell cluster" aria-label="">Violin Plot</button>
             <button class="btn btn-light btn-sm mx-1 my-0" id="btn_cell_marker_table" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_datatable_cell_marker" aria-expanded="false" aria-controls="container_panel_datatable_cell_marker" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a data table</i> displaying <b>cell markers</b> for a given cell cluster" aria-label="">Cell Marker Table</button>
             <button class="btn btn-light btn-sm mx-1 my-0" id="btn_correl_gene_table" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_panel_datatable_correl" aria-expanded="false" aria-controls="container_panel_datatable_correl" data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a data table</i> displaying a list of genes <b>whose expression is correlated with the current gene</b>" aria-label="">Co-expressed Gene Table</button>
 <!--             <button class="btn btn-light btn-sm mx-1 my-0" type="button" data-toggle="collapse" data-toggle="button" data-target="#container_interaction_network" aria-expanded="false" aria-controls="container_interaction_network"data-tooltip="tooltip" data-placement="bottom" data-html="true" title="Press to <b>toggle</b> <i>a table</i> showing <b>predicted/experimental structural properties</b> of aligned query and SARS-CoV-2 target proteins" aria-label="">Interactions</button> -->
@@ -966,7 +986,7 @@ code {
                             </div> -->
                         </div>
                         <div class="carousel-item">
-                            <img src="https://gist-fgl.github.io/sc-caf-atlas/img/website3_compressed.jpg" class="d-block w-100 mx-auto" style="max-width: 708px; max-height: 900px !important;" alt="broad cell types">
+                            <img src="https://gist-fgl.github.io/sc-caf-atlas/img/for_website_update.png" class="d-block w-100 mx-auto" style="max-width: 708px; max-height: 900px !important;" alt="broad cell types">
 <!--                             <div class="carousel-caption d-none d-md-block">
                                 <h2>Filter cross-reactive immune epitopes</h2>
                                 <p>Multiple filters can be applied.<br>To remove a filter, click the filter again</p>
@@ -998,7 +1018,7 @@ code {
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">Start Exploring</button>
-                <h5 class="text-muted" style="text-align:center;">Single-cell data analysis has been conducted by Dr. Han Luo at the West China Hospital, Sichuan universtiy. The web application has been developed by Hyunsu An at Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
+                <h5 class="text-muted" style="text-align:center;">Single-cell data analysis has been conducted by Dr. Han Luo at the West China Hospital, Sichuan universtiy. The web application has been developed by Hyunsu An at the Gwangju Institute of Science and Technology under the supervision of Professor JiHwan Park.</h5>
                 <img src="https://gist-fgl.github.io/sc-caf-atlas/img/west_china_hospital_logo.png" class="d-block w-100 ml-auto mr-2" style="max-width: 200px; max-height: 250px !important;" alt="West China Hospital Logo">
                 <img src="https://gist-fgl.github.io/sc-caf-atlas/img/GIST_logo.png" class="d-block w-100 ml-2 mr-auto" style="max-width: 230px; max-height: 230px !important;" alt="GIST Logo">
             </div>
@@ -1044,11 +1064,13 @@ var DragSort=function(t){
             }
             console.log( "[Load_Dataset] loading data for ", name_adata );
             object_data.main.name_adata = name_adata; // update the name of the current data
+            object_data.main.name_adata_representative = dict_name_adata_to_name_adata_representative[ name_adata ]; // retrieve representative name of adata
             // for faster async loading, the data files will be loaded together
-            var l_remote_file = [ "current/rawdata/base64/box_precomputed.all.multiplied_by_1000.cell_type.tsv.gz.base64.txt",
-                                "current/rawdata/base64/cell_marker.index.tsv.gz.base64.txt",
-                                "current/rawdata/base64/cells." + name_adata + ".tsv.gz.base64.txt",
-                                "current/rawdata/base64/expr." + name_adata + ".multiplied_by_1000.index.tsv.gz.base64.txt" ];
+            var l_remote_file = [ object_data.file.base_url + "box_precomputed.all.multiplied_by_1000.cell_type.tsv.gz.base64.txt",
+                                object_data.file.base_url + "cell_marker." + object_data.main.name_adata_representative + ".index.tsv.gz.base64.txt",
+                                object_data.file.base_url + "cells." + name_adata + ".tsv.gz.base64.txt",
+                                object_data.file.base_url + "expr." + name_adata + ".multiplied_by_1000.index.tsv.gz.base64.txt",
+                                object_data.file.base_url + "expr.2000cells_per_cluster.correlation.index.tsv.gz.base64.txt" ];
             await LoadRemoteData( l_remote_file ); // load remote core data 
             
             object_data.main.int_num_cells = object_data.file.dict_name_file_to_parsed_data[ "cells." + name_adata + ".tsv.gz.base64.txt" ].cell_barcode.length // update the number of cells in the current dataset
@@ -1097,7 +1119,7 @@ var DragSort=function(t){
             Select_ChangeSelected( select_annotation, val_default );
             
             // plot graph
-            await Change_UMAP_Coordinate( name_adata )
+            await Change_UMAP_Coordinate( name_adata, false ); // disable syncing of the two graphs (default ranges)
             
             console.log( "[Load_Dataset] resolved" );
             Loading_Screen( false );
@@ -1695,15 +1717,16 @@ var DragSort=function(t){
             Loading_Screen( false ) // add loading screen
         });
     }
-    async function ParseData( ) { // parse loaded data and prepare data objects
+    async function ParseData( ) { // parse loaded data and prepare data objects for the given 'name_adata'
         return new Promise( async function( resolve, reject ) { 
-            let name_adata = object_data.main.name_adata; // retrieve the name of the current dataset
+            let name_adata = object_data.main.name_adata, // retrieve the name of the current dataset
+                name_adata_representative = object_data.main.name_adata_representative; // retrieve representative name of adata
             Loading_Screen( true );
         // initialize cache objects
-            InitializeCacheForRemoteData( object_data.main.gene.expr, object_data.file.dict_name_file_to_parsed_data[ "expr." + name_adata + ".multiplied_by_1000.index.tsv.gz.base64.txt" ], [ 'gene_symbol' ], object_data.file.base_url + "expr." + name_adata + ".multiplied_by_1000.tsv.gz.base64.concatenated.txt" )
+            InitializeCacheForRemoteData( object_data.main.gene.expr, object_data.file.dict_name_file_to_parsed_data[ "expr." + name_adata + ".multiplied_by_1000.index.tsv.gz.base64.txt" ], [ 'gene_symbol' ], object_data.file.base_url + "expr." + name_adata + ".multiplied_by_1000.tsv.gz.base64.concatenated.txt", nj.zeros( object_data.main.int_num_cells ).tolist( ) ); // retrieve the number of cells for the current dataset // default data is zero counts  
             EvictCache( object_data.main.gene.expr, null, true ); // purge gene expression data of the previous dataset to save up space
-            InitializeCacheForRemoteData( object_data.main.cell_marker, object_data.file.dict_name_file_to_parsed_data[ "cell_marker.index.tsv.gz.base64.txt" ], [ 'cluster_name' ], object_data.file.base_url + "cell_marker.tsv.gz.base64.concatanated.txt" )
-//             InitializeCacheForRemoteData( object_data.main.gene.correl, object_data.file.dict_name_file_to_parsed_data[ "expr.correlation.index.tsv.gz.base64.txt" ], [ 'gene_symbol' ], object_data.file.base_url + "expr.correlation.tsv.gz.base64.concatanated.txt" )
+            InitializeCacheForRemoteData( object_data.main.cell_marker, object_data.file.dict_name_file_to_parsed_data[ "cell_marker." + name_adata_representative + ".index.tsv.gz.base64.txt" ], [ 'cluster_name' ], object_data.file.base_url + "cell_marker." + name_adata_representative + ".tsv.gz.base64.concatanated.txt" );
+            InitializeCacheForRemoteData( object_data.main.gene.correl, object_data.file.dict_name_file_to_parsed_data[ "expr.2000cells_per_cluster.correlation.index.tsv.gz.base64.txt" ], [ 'gene_symbol' ], object_data.file.base_url + "expr.2000cells_per_cluster.correlation.tsv.gz.base64.concatanated.txt" );
 
             console.log( "[ParseData] resolved" );
             Loading_Screen( false );
@@ -1711,7 +1734,7 @@ var DragSort=function(t){
         });
     }
     // caching data from local or remote sources
-    function InitializeCacheForRemoteData( object_cache, dict_arr_index, l_col_key, dir_remote_file ) { 
+    function InitializeCacheForRemoteData( object_cache, dict_arr_index, l_col_key, dir_remote_file, default_data = null ) { 
         object_cache.dir_remote_file = dir_remote_file;
         object_cache.dict_arr_index = dict_arr_index;
         // index 'dict_arr_index' with 'l_col_key', combining values from 'l_col_key' with '|'
@@ -1731,6 +1754,7 @@ var DragSort=function(t){
         }
         object_cache.l_key = l_key;
         object_cache.dict_key_to_index = Index_list_with_dictionary( l_key );
+        object_cache.default_data = default_data; // set default data
     }
     function EvictCache( object_cache, l_key = null, flag_purge = false ) { // evict cache according to the amount of incoming data (l_key). Evict all data if flag_perge is true
         if ( flag_purge ) {
@@ -1776,7 +1800,7 @@ var DragSort=function(t){
         }
         return l_key_to_be_updated;
     }
-    async function UpdateCache( object_cache, function_preprocessing_data = null, l_key_to_be_updated_from_remote_source = null, dict_incoming_data = null ) { // update cache using either locally available data 'dict_incoming_data' (key = key for caching, value = incoming data) or remotely available data 'l_key_to_be_updated_from_remote_source'
+    async function UpdateCache( object_cache, function_preprocessing_data = null, l_key_to_be_updated_from_remote_source = null, dict_incoming_data = null ) { // update cache using either locally available data 'dict_incoming_data' (key = key for caching, value = incoming data) or remotely available data 'l_key_to_be_updated_from_remote_source' 
         return new Promise( async function( resolve, reject ) { 
             let i = 0, flag_cache_evicted = false; // a flag indicating whether cache has been evicted 
             if ( dict_incoming_data === null ) {
@@ -1785,15 +1809,24 @@ var DragSort=function(t){
                     return false;
                 }
                 l_key_to_be_updated_from_remote_source = EvictCache( object_cache, l_key_to_be_updated_from_remote_source ); // evict (free) cache data before downloading new data from the remote source
-                flag_cache_evicted = true;
-                let l_index_key = [ ];
+                flag_cache_evicted = true; // mark that the cache has been already evicted.
+                let l_index_key = [ ],
+                    l_key_not_exist = [ ];
                 for ( i = 0; i < l_key_to_be_updated_from_remote_source.length; i ++ ) {
-                    l_index_key.push( object_cache.dict_key_to_index[ l_key_to_be_updated_from_remote_source[ i ] ][ 0 ] );
+                    if ( l_key_to_be_updated_from_remote_source[ i ] in object_cache.dict_key_to_index ) {
+                        l_index_key.push( object_cache.dict_key_to_index[ l_key_to_be_updated_from_remote_source[ i ] ][ 0 ] );
+                    } else {
+                        l_key_not_exist.push( l_key_to_be_updated_from_remote_source[ i ] ); // if the current key does not exist in the output data, collect the keys in the 'l_key_not_exist'
+                    }
                 }
                 let l_record = await RetrieveRemoteFile_PartialData( l_index_key, object_cache.dict_arr_index, object_cache.dir_remote_file );
                 dict_incoming_data = { };
                 for ( i = 0; i < l_record.length; i ++ ) {
                     dict_incoming_data[ l_key_to_be_updated_from_remote_source[ i ] ] = l_record[ i ];
+                }
+                // fill data with default_data 
+                for ( i = 0; i < l_key_not_exist.length; i ++ ) {
+                    dict_incoming_data[ l_key_not_exist[ i ] ] = object_cache.default_data; // 'default_data' : a data that will be used when the key is not available in the index
                 }
             }
             let l_key = Object.keys( dict_incoming_data );
@@ -1825,6 +1858,7 @@ var DragSort=function(t){
     object_data.flags.flag_tagify_searchbox_main_mutationobserver_attached = false;
     function Initialize_SearchBox_Main( ) {
         let name_adata = object_data.main.name_adata; // retrieve the name of the current dataset
+        object_data.setting.plot.preview_gene.flag_enabled = document.getElementById( "checkbox__plotly_sclncrna_expression_preview_boxplot_enable_disable" ).checked; // retrieve current setting for preview-gene
         tagify_searchbox_main = new Tagify( searchbox_main, {
             dropdown: { 
                 maxItems: parseInt( ( window.innerHeight > 1500 ) ? 100 : Math.max( 1, ( window.innerHeight - 500 ) / 100 ) ), // set max number of dropdown items according to the window height
@@ -1849,10 +1883,12 @@ var DragSort=function(t){
             }
             $( e.detail.tag ).mouseenter( function( e ) {
                 console.log( 'mouse enter', e )
-                let gene_symbol = e.target.textContent; // retrieve gene_symbol
-                // preview a gene on hover
-                $( "#container_plotly_searchbox_main_preview" ).collapse( 'show' ); // show boxplot panel
-                PreviewGene( gene_symbol );
+                if ( object_data.setting.plot.preview_gene.flag_enabled ) {
+                    let gene_symbol = e.target.textContent; // retrieve gene_symbol
+                    // preview a gene on hover
+                    $( "#container_plotly_searchbox_main_preview" ).collapse( 'show' ); // show boxplot panel
+                    PreviewGene( gene_symbol );
+                }
             })
                 .mouseleave( function( e ) {
                 console.log( 'mouse leave', e )
@@ -1861,8 +1897,10 @@ var DragSort=function(t){
             })
                 .mousemove( function( e ) {
                 console.log( 'mouse move', e )
-                // show boxplot panel
-                $( "#container_plotly_searchbox_main_preview" ).collapse( 'show' ); // show boxplot panel
+                if ( object_data.setting.plot.preview_gene.flag_enabled ) {
+                    // show boxplot panel
+                    $( "#container_plotly_searchbox_main_preview" ).collapse( 'show' ); // show boxplot panel
+                }
             })
         } )
               .on( 'click', e => { 
@@ -1880,12 +1918,16 @@ var DragSort=function(t){
             if ( ! isString( e.detail.value ) ) { return -1; }
             let gene_symbol = e.detail.value; // retrieve current input
             if ( gene_symbol in object_data.main.gene.expr.dict_key_to_index ) { // show preview of the gene if it exists in the data
-                PreviewGene( gene_symbol );
+                if ( object_data.setting.plot.preview_gene.flag_enabled ) {
+                    PreviewGene( gene_symbol );
+                }
             }
         } )
               .on( "dropdown:hide", ( e ) => { console.log( "dropdown:hide" ); $( "#container_plotly_searchbox_main_preview" ).collapse( 'hide' ); } )
               .on( "dropdown:show", ( e ) => { // preview during exploring dropdown options
-            $( "#container_plotly_searchbox_main_preview" ).collapse( 'show' );
+            if ( object_data.setting.plot.preview_gene.flag_enabled ) {
+                $( "#container_plotly_searchbox_main_preview" ).collapse( 'show' );
+            }
             console.log( "dropdown:show" );
             if ( ! object_data.flags.flag_tagify_searchbox_main_mutationobserver_attached ) {
                 let dropdown = document.querySelector( '.tagify__dropdown' ); // retrieve DOM of active dropdown
@@ -1896,8 +1938,10 @@ var DragSort=function(t){
                 let observer = new MutationObserver( function( mutations ) {
                     mutations.forEach( function( e ) {
                         if ( ( e.attributeName == 'class' ) & ( e.target.className == "tagify__dropdown__item tagify__dropdown__item--active" ) ) { // detect the innerHTML of the active element using MutationObserver (the closely matched gene_symbol)
-                            console.log( "dropdown active element:", e.target.innerHTML );
-                            PreviewGene( e.target.innerHTML );
+                            if ( object_data.setting.plot.preview_gene.flag_enabled ) {
+                                console.log( "dropdown active element:", e.target.innerHTML );
+                                PreviewGene( e.target.innerHTML );
+                            }
                         }
                     });
                 });
@@ -1990,7 +2034,7 @@ var DragSort=function(t){
     object_data.setting.expression.n_digits_below_floating_point = 3; // number of digits below floading point of the original expression values (converted to integer by multiplying 1000 during delivery of the data)
     object_data.main.datatable = { 'datatable_cell_marker' : { df : null, name : 'cell_marker' }, 'datatable_correl' : { df : null, name : 'correl_gene' } };
     
-    async function Change_UMAP_Coordinate( str_dataset = null ) { 
+    async function Change_UMAP_Coordinate( str_dataset = null, flag_sync = true ) { // sync two graph by default
         return new Promise( async function( resolve, reject ) { 
             if ( str_dataset === null ) {
                 // change x or y-axis of scatter plot using the current setting
@@ -2094,9 +2138,9 @@ var DragSort=function(t){
             }
             // Update coordinates of scatter plots
             // draw cell annotation plot
-            PlotCellAnnotation( );
+            PlotCellAnnotation( false, flag_sync );
             // draw expression plot
-            await UpdateGene( );
+            await UpdateGene( false, flag_sync );
             
             console.log( "[Change_UMAP_Coordinate] resolved" );
             Loading_Screen( false );
@@ -2176,7 +2220,7 @@ var DragSort=function(t){
         PreviewGene( object_data.main.gene.gene_symbol ); // update box plot data for the current annotation
     }
     
-    async function UpdateGene( flag_restyle = false ) { // draw a new plot by default
+    async function UpdateGene( flag_restyle = false, flag_sync = true ) { // draw a new plot by default // sync the drawn graph to the other graph by default
         console.log( "[UpdateGene] updating gene started" );
         let str_dataset = object_data.main.umap.dataset, // retrieve current tissue
             gene_symbol = object_data.main.gene.gene_symbol;
@@ -2289,25 +2333,27 @@ var DragSort=function(t){
             plotSingleCellExpression.on( 'plotly_click', async function( data ) {
                 PlotlyCallBackSingleCellMarker( data.points[ 0 ] ); // open single cell marker for the first data
             });
-            // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
-            let lay = plotSingleCellAnnotation.layout
-            if ( ! ( lay.xaxis.autorange && lay.yaxis.autorange ) ) { // only trigger relayout if there is an alteration of coordinates of 'plotSingleCellExpression'
-                Plotly.relayout( plotSingleCellExpression, { 'xaxis.range[0]': lay.xaxis.range[ 0 ], 'xaxis.range[1]': lay.xaxis.range[ 1 ], 'xaxis.autorange': lay.xaxis.autorange, 'yaxis.range[0]': lay.yaxis.range[ 0 ], 'yaxis.range[1]': lay.yaxis.range[ 1 ], 'yaxis.autorange': lay.yaxis.autorange } ); // perform relayout operation
+            if ( flag_sync ) {
+                // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
+                let lay = plotSingleCellAnnotation.layout
+                if ( ! ( lay.xaxis.autorange && lay.yaxis.autorange ) ) { // only trigger relayout if there is an alteration of coordinates of 'plotSingleCellExpression'
+                    Plotly.relayout( plotSingleCellExpression, { 'xaxis.range[0]': lay.xaxis.range[ 0 ], 'xaxis.range[1]': lay.xaxis.range[ 1 ], 'xaxis.autorange': lay.xaxis.autorange, 'yaxis.range[0]': lay.yaxis.range[ 0 ], 'yaxis.range[1]': lay.yaxis.range[ 1 ], 'yaxis.autorange': lay.yaxis.autorange } ); // perform relayout operation
+                }
             }
         }
-//         // Update correlated genes 
+        // Update correlated genes 
         
-//         object_cache = object_data.main.gene.correl;
-//         await UpdateCache( object_cache, null, [ gene_symbol ] ); // update cache of correlated gene data
-//         Display_DataTable( 'container_datatable_correl', 'datatable_correl', object_cache.data[ gene_symbol ].data, [ "gene_symbol", "correlation_coefficient", "probability" ] );
-//         // change panel name
-//         document.getElementById( "panel_name_correl_gene").innerHTML = "Co-Expressed Genes of " + gene_symbol;
-//         // change datatable name 
-//         object_data.main.datatable[ 'datatable_correl' ].name = `correl_gene.${gene_symbol}`;
-//         // show datatable panel
-//         $( "#container_panel_datatable_correl" ).collapse( 'show' )
+        object_cache = object_data.main.gene.correl;
+        await UpdateCache( object_cache, null, [ gene_symbol ] ); // update cache of correlated gene data
+        Display_DataTable( 'container_datatable_correl', 'datatable_correl', object_cache.data[ gene_symbol ].data, [ "gene_symbol", "correlation_coefficient", "probability" ] );
+        // change panel name
+        document.getElementById( "panel_name_correl_gene").innerHTML = "Co-Expressed Genes of " + gene_symbol;
+        // change datatable name 
+        object_data.main.datatable[ 'datatable_correl' ].name = `correl_gene.${gene_symbol}`;
+        // show datatable panel
+        $( "#container_panel_datatable_correl" ).collapse( 'show' )
         
-        // Update interaction graph
+//         Update interaction graph
 //         LoadRemoteTextFile( "http://www.rna-society.org/rnainter/php_mysql/api.php?keyword=Actb&species=Mus musculus" )
         
         // Violin plots
@@ -2318,7 +2364,7 @@ var DragSort=function(t){
         object_data.main.umap.str_name_data_annotation = str_name_data_annotation;
         
         // only update violine plot when category has string datatype
-        if ( typeof object_data.main.umap.dictarr[ str_name_data_annotation ][ 0 ] == 'string' ) {
+        if ( ! ( str_name_data_annotation in { 'cell_barcode' : '', 'UMAP_1' : '', 'UMAP_2' : '', 'nCount_RNA' : '', 'nFeature_RNA' : '', 'percent.mt' : '' } ) ) { // typeof object_data.main.umap.dictarr[ str_name_data_annotation ][ 0 ] == 'string'
             // build list of traces for each category
             dictarr = Pivot( object_data.main.umap.dictarr[ str_name_data_annotation ], l_expr ); // key = cluster, value = list of expression values.
             let trace_template = { 
@@ -2366,8 +2412,8 @@ var DragSort=function(t){
             }
             l_trace = l_trace.sort( SortViolinTrace_Expression ); // sort by mean expression
             let layout = {
-                margin: { l: 50, r: 65, b: 150, t: 50, pad: 4 },
-                yaxis: { title : "Normalized Expression", rangemode: "nonnegative" },
+                margin: { l: 50, r: 65, b: 150, t: 5, pad: 4 },
+                yaxis: { title : "Normalized Expression of " + object_data.main.gene.gene_symbol, rangemode: "nonnegative" },
                 legend: { tracegroupgap: 0 },
                 violingap: 0, // split violin plot for two covid statuses
                 violingroupgap: 0,
@@ -2377,7 +2423,11 @@ var DragSort=function(t){
                 l_trace[ i ].x0 = object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts ? l_trace[ i ].x0_ignore_cells_with_zero_counts__true : l_trace[ i ].x0_ignore_cells_with_zero_counts__false ;
                 l_trace[ i ].y = object_data.setting.plot.single_cell_violin.ignore_cells_with_zero_counts ? l_trace[ i ].y_ignore_cells_with_zero_counts__true : l_trace[ i ].y_ignore_cells_with_zero_counts__false ;
             }
-            Plotly.newPlot( plotSingleCellExpressionViolin, l_trace, layout, { ... config_plotly, filename: name_application + '__Expression_of_' + gene_symbol, height: 600, width: 1100 } );
+            let preview_height = 450;
+            if ( ! isNaN( document.getElementById( 'input_plot_height_violin' ).value ) ) { // if the input is a valid number
+                preview_height = parseInt( document.getElementById( 'input_plot_height_violin' ).value );
+            }
+            Plotly.newPlot( plotSingleCellExpressionViolin, l_trace, layout, { ... config_plotly, filename: name_application + '__Expression_of_' + gene_symbol, height: preview_height, width: document.getElementById( 'navbar_supplementary_graph_and_tables' ).offsetWidth } ); // plot graph with the width of the navbar
         }
     }
     object_data.setting.plot.annotation = { };
@@ -2393,7 +2443,7 @@ var DragSort=function(t){
     // number of cells for each class
     object_data.setting.plot.annotation.dict_dataset_to_dict_name_col_to_dict_class_to_num_cells = {'all': {'group': {'Tumor': 528811, 'Normal': 162627, 'Adjacent': 146950}, 'tissue': {'lung': 207411, 'PDAC': 165197, 'bladder': 85384, 'colorectal': 62203, 'thyroid': 60768, 'gastric': 59874, 'breast': 43751, 'prostate': 43193, 'ICC': 42609, 'ovarian': 41094, 'liver': 26904}, 'cell_type': {'Epithelium': 268469, 'Lymphocyte': 202077, 'Myeloid': 151298, 'Fibroblast': 104804, 'Endothelium': 74102, 'Plasma': 37638}, 'name_cluster': {'c35': 268469, 'c18': 41108, 'c9': 36175, 'c10': 35815, 'c11': 32858, 'c19': 32218, 'c12': 29697, 'c1': 28802, 'c25': 27011, 'c20': 23737, 'c2': 22889, 'c21': 22059, 'c26': 21615, 'c13': 19824, 'c3': 19059, 'c22': 17650, 'c4': 16164, 'c14': 16008, 'c27': 15036, 'c5': 14742, 'c23': 12981, 'c15': 12052, 'c16': 11504, 'c28': 10392, 'c17': 8144, 'c29': 8057, 'c30': 7585, 'c31': 6537, 'c32': 6257, 'c33': 4982, 'c34': 4220, 'c24': 1545, 'c6': 1363, 'c7': 1186, 'c8': 487, 'discarded': 160}, 'disease': {'na': 162627, 'ADC': 75298, 'thyroid-cancer': 46623, 'moderately-poorly-differentiated-PDAC': 44114, 'breast-cancer': 43751, 'bladder-urothelial-tumor': 43681, 'Intrahepatic-cholangiocarcinoma': 42609, 'ovarian-cancer': 41094, 'colorectal-cancer': 39954, 'Adenomatous': 39450, 'Adenocarcinoma': 33632, 'prostate-cancer': 30711, 'moderately-differentiated-PDAC': 22393, 'Large-cell': 18878, 'normal-pancreas/solid-pseudopapillary-tumor': 15739, 'control': 14737, 'Pleiomorphic': 14640, 'normal-pancreas/mucinous-cystic-neoplasia-': 13485, 'well-moderately-differentiated-PDAC': 13042, 'ADC(Double)': 12360, 'poorly-differentiated-PDAC': 9765, 'well-differentiated-PDAC': 8378, 'PDAC': 7727, 'Pca': 7316, 'Squamous': 6271, 'normal-pancreas/small intestine papillary adenocarinoma': 5924, 'normal-pancreas/pancratic-neuroendocrine-tumor': 5049, 'Severe-intestinal-metaplasia-,-mild-atrophy,-no-dysplasia': 4671, 'Squamous-': 4153, 'normal-pancreas/choledochal-neuroendocrine-tumors': 4140, 'normal-pancreas/serous-cystic-neoplasia': 3570, 'normal-pancreas/duodenal-intraepithelial-neoplasia': 2606}, 'cancer_stage': {'na': 335778, 'IIB': 68595, 'normal': 65250, 'IB': 59152, 'II': 52523, 'IA': 47969, 'III': 37532, 'IA3': 27347, 'IIIA': 26514, 'high-grade': 23824, 'IIA': 22320, 'low-grade': 19857, 'IIIB': 14792, 'Intestinal invasive adenocarcinoma ': 9389, 'Diffuse poorly cohesive adenocarcinoma with signet ring features': 6101, 'Invasive adenocarcarcinoma with mucinous and signet ring features': 5774, 'I': 5128, 'Intestinal adenocarcinoma': 3443, 'Mixed intestinal poorly cohesive adenocarcinoma with signet ring component': 3271, 'IVB': 2378, 'IVC': 1451}, 'gender': {'na': 328266, 'F': 293731, 'M': 216391}, 'sampling_site': {'na': 239961, 'neoplasm': 128818, 'head': 47679, 'tLung': 44778, 'nLung': 42880, 'normal': 39416, 'body': 30175, 'tumor': 28665, 'body and tail': 25694, 'normal tissue adjacent to neoplasm': 21329, 'edge': 20828, 'middle': 19445, 'core': 17647, 'tail': 17518, 'adjacent normal mucosae': 14737, 'neoplasm core': 14664, 'uncinate process': 14469, 'neoplasm border': 12781, 'descending duodenum': 8530, 'Gastric': 8513, 'Body ': 6101, 'normal tissue adjacent to neoplasm ': 5931, 'GEJ+stomach': 5774, 'Body lesser curve': 4671, 'lower esophagus: center is 0.3 cm above GEJ': 4241, 'common bile duct': 4140, 'Body and antrum invovled': 3443, 'GEJ': 3271, 'lower esophagus: center is 0.2 cm above GEJ': 1413, 'Cardia GEJ': 876}, 'cell_anno_detailed': {'cancerous/normal epithelial cells (EP)': 268469, 'lymphoid cells (LC)': 202077, 'myeloid cells (MC)': 71739, 'plasma cell (PC)': 37638, 'normal fibroblasts (NF)': 33801, 'APOE+ tumor associated macrophage (APOE+ TAM)': 32218, 'normal endothelial cells (NEC)': 32007, 'cancer-associated myofibroblasts (CAF_myo)': 28802, 'tumor endothelial cells (TEC)': 27011, 'FABP4+ macrophage (FABP4+ MP)': 23737, 'inflammatory CAF (CAF_infla)': 22889, 'tumor/adjacent confined suppressive dendrite cells (suppressive DC)': 22059, 'adipogenic CAF (CAF_adi)': 16164, 'endothelial cells (EC)': 15036, 'plasmacytoid DCs (pDC)': 1545, 'CAF exhibiting endothelial-mesenchymal transition (CAF_EndoMT)': 1363, 'fibroblast-like peripheral nerve cells (CAF_PN)': 1186, 'antigen-presenting fibroblasts (CAF_api)': 487, 'discarded (discarded)': 160}}, 'data_SF1G': {'seurat_clusters': {0: 5485, 1: 5093, 2: 3040, 3: 1928, 4: 1413, 5: 960, 6: 901, 7: 766}}, 'data_SF3A': {'seurat_clusters': {0: 28703, 1: 17953, 2: 15693, 3: 15316, 4: 14923, 5: 14105, 6: 13776, 7: 12742, 8: 11672, 9: 10098, 10: 8716, 11: 7115, 12: 3747, 14: 2257, 16: 514}, 'cell_anno_subclustering': {'CD8+ TEM': 63196, 'CD4+ TCM': 30695, 'DN T': 15693, 'Treg': 14923, 'TIM3+ NKC': 13776, 'CD8+ CTL': 10098, 'CD160+ NKC': 7115, 'Cycling CD8+ T': 3747, 'Cycling CD4+ T': 2257, 'Cycling NKC': 514}}, 'data_F5D': {'state': {1: 1994, 4: 1962, 5: 1587, 7: 1067, 6: 483, 2: 234, 3: 36}}, 'data_F4D': {'state': {3: 490, 5: 429, 2: 274, 1: 261, 4: 33}}, 'data_F2F': {'state_detailed': {'CAF_State_3': 2891, 'CAF_State_2': 2476, 'CAF_State_1': 2133}}};
     
-    async function PlotCellAnnotation( flag_restyle = false ) { // draw a new plot by default
+    async function PlotCellAnnotation( flag_restyle = false, flag_sync = true ) { // draw a new plot by default // sync shown ranges with the other graph by default
         let str_dataset = object_data.main.umap.dataset, // retrieve current tissue
             option_selected = Select_Get_Selected_Option_Using_ID( "select_umap_annotation_data" ),
             str_name_data_annotation = option_selected.value, // retrieve name of data for annotations
@@ -2433,7 +2483,6 @@ var DragSort=function(t){
                     dict_color = dict_dataset_to_dict_color[ str_dataset_default ]; // if the column name is not set for the current dataset, use the color of the default dataset
                 }
                 object_data.main.umap.dict_color_anno = dict_color[ str_name_data_annotation ]; // update colors of the current annotation
-                console.log( str_name_data_annotation, dict_color ); 
                 l_color = ArrayMap( dictarr[ str_name_data_annotation ], object_data.main.umap.dict_color_anno, '#A9A9A9' ); // default color is '#A9A9A9'
                 str_hovertemplate_additional_line = "<b>" + str_name_option_selected + "</b>: <i><b>%{customdata[5]}</b></i><br>"; // only MT percentage data will be shown as floating point numbers
                 break;
@@ -2533,17 +2582,20 @@ var DragSort=function(t){
             plotSingleCellAnnotation.on( "plotly_relayout" , function( ed ) {
                 PlotlySynchronizedLayout( ed, l_div_plotly );
             });
-            // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
-            let lay = plotSingleCellExpression.layout
-            if ( ! ( lay.xaxis.autorange && lay.yaxis.autorange ) ) { // only trigger relayout if there is an alteration of coordinates of 'plotSingleCellExpression'
-                Plotly.relayout( plotSingleCellAnnotation, { 'xaxis.range[0]': lay.xaxis.range[ 0 ], 'xaxis.range[1]': lay.xaxis.range[ 1 ], 'xaxis.autorange': lay.xaxis.autorange, 'yaxis.range[0]': lay.yaxis.range[ 0 ], 'yaxis.range[1]': lay.yaxis.range[ 1 ], 'yaxis.autorange': lay.yaxis.autorange } ); // perform relayout operation
+            if ( flag_sync ) {
+                // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
+                let lay = plotSingleCellExpression.layout
+                if ( ! ( lay.xaxis.autorange && lay.yaxis.autorange ) ) { // only trigger relayout if there is an alteration of coordinates of 'plotSingleCellExpression'
+                    Plotly.relayout( plotSingleCellAnnotation, { 'xaxis.range[0]': lay.xaxis.range[ 0 ], 'xaxis.range[1]': lay.xaxis.range[ 1 ], 'xaxis.autorange': lay.xaxis.autorange, 'yaxis.range[0]': lay.yaxis.range[ 0 ], 'yaxis.range[1]': lay.yaxis.range[ 1 ], 'yaxis.autorange': lay.yaxis.autorange } ); // perform relayout operation
+                }
             }
         }
     }
+    dict_name_adata_to_name_col_for_cluster = { 'all' : 'name_cluster', 'data_SF1G' : 'seurat_clusters', 'data_SF3A' : 'cell_anno_subclustering', 'data_F5D' : 'state', 'data_F4D' : 'state', 'data_F2F' : 'state_detailed' }; // column name used for marker gene detection
     async function PlotlyCallBackSingleCellMarker( clicked_point ) { // load the cell-type marker gene table of the cell-type to which the clicked cell belongs
 //         console.log( clicked_point );
         let index_point = clicked_point.pointIndex, dictarr = object_data.main.umap.dictarr;
-        let str_name_cluster = dictarr[ "name_cluster" ][ index_point ], str_key = str_name_cluster;
+        let str_name_cluster = dictarr[ dict_name_adata_to_name_col_for_cluster[ object_data.main.name_adata_representative ] ][ index_point ], str_key = str_name_cluster;
         let object_cache = object_data.main.cell_marker;
         await UpdateCache( object_cache, null, [ str_key ] ); // update cache of cell marker data
         Display_DataTable( 'container_datatable_cell_marker', 'datatable_cell_marker', object_cache.data[ str_key ].data, [ 'cluster_name', 'gene_name', 'log2_fold_changes', 'p_val', 'corrected_p_val' ] );
@@ -2638,8 +2690,13 @@ var DragSort=function(t){
     }; // define color for each tissue
     function SortBoxTrace( trace_a, trace_b ) { return - ( trace_a.q3 - trace_b.q3 ) } // Sort Plotly Boxplot traces based on parameter values
     object_data.main.preview_gene = { previous : { str_dataset : 'all', str_name_data_annotation : 'default', gene_symbol : 'default' } };
-    dict_name_adata_to_name_adata_for_box_plot_preview = { "1000cells_per_cluster" : "all", "2000cells_per_cluster" : "all", "5000cells_per_cluster" : "5000cells_per_cluster", "all" : "all", "data_SF1G" : "data_SF1G", "data_SF3A" : "data_SF3A", "fibroblast" : "all", "data_F5D" : "data_F5D", "data_F4D" : "data_F4D", "data_F2F" : "data_F2F" } // map name_adata used in the box plot gene expression preview graph for each name_adata
+    dict_name_adata_to_name_adata_representative = { "1000cells_per_cluster" : "all", "2000cells_per_cluster" : "all", "5000cells_per_cluster" : "5000cells_per_cluster", "all" : "all", "data_SF1G" : "data_SF1G", "data_SF3A" : "data_SF3A", "fibroblast" : "all", "data_F5D" : "data_F5D", "data_F4D" : "data_F4D", "data_F2F" : "data_F2F" } // map name_adata used in the box plot gene expression preview graph for each name_adata
     async function PreviewGene( gene_symbol ) { // draw preview of expression of the current gene using boxplots
+        object_data.setting.plot.preview_gene.flag_enabled = document.getElementById( "checkbox__plotly_sclncrna_expression_preview_boxplot_enable_disable" ).checked; // retrieve current setting for preview-gene
+        if ( ! object_data.setting.plot.preview_gene.flag_enabled ) {
+            console.log( '[PreviewGene] preview gene has been disabled' );
+            return -1;
+        }
         // retrieve str_name_data_annotation from the current setting
         let str_name_data_annotation = object_data.main.umap.str_name_data_annotation,
             str_dataset = object_data.main.umap.dataset,
@@ -2656,17 +2713,22 @@ var DragSort=function(t){
         let window_width = window.innerWidth,
             window_height = window.innerHeight,
             window_width_excluding_sidebar = $id( "controlBox_plotly_graph_main" ).offsetWidth,
-            preview_height = parseInt( Math.min( Math.max( 175, window_height / 3.5 ), 500 ) ),
+            preview_height = parseInt( Math.min( Math.max( 175, window_height / 3.5 ), 300 ) ),
             preview_width = window_width_excluding_sidebar,
             div_preview = $id( "plotly_searchbox_main_preview" );
+        // if the box plot height has been set, use the setting
+        if ( ! isNaN( document.getElementById( 'input_plot_height_boxplot' ).value ) ) { // if the input is a valid number
+            preview_height = parseInt( document.getElementById( 'input_plot_height_boxplot' ).value );
+        }
+            
         div_preview.style.height = ( preview_height ).toString( ) + 'px';
         div_preview.style.width = ( preview_width ).toString( ) + 'px';
         
         // load and initialize box plot data 
         if ( ! ( 'gene_summary' in object_data.main ) || str_name_data_annotation != object_data.main.gene_summary.str_name_data_annotation ) { // if box plot data has not been parsed or annotation data has been changed, initialize the data
             // update box plot data if the given 'str_name_data_annotation' is valid
-            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '', 'cell_anno_subclustering' : '', 'seurat_clusters' : '', 'seurat_clusters' : '', 'state_detailed' : '', 'state' : '', 'gender' : '' } ) {
-                let name_file_box_plot_summary = "box_precomputed." + dict_name_adata_to_name_adata_for_box_plot_preview[ object_data.main.name_adata ] + ".multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
+            if ( str_name_data_annotation in { 'name_cluster' : '', 'cell_type' : '', 'group' : '', 'tissue' : '', 'disease' : '', 'cancer_stage' : '', 'cell_anno_detailed' : '', 'cell_anno_subclustering' : '', 'seurat_clusters' : '', 'seurat_clusters' : '', 'state_detailed' : '', 'state' : '', 'gender' : '', 'sampling_site' : '' } ) {
+                let name_file_box_plot_summary = "box_precomputed." + dict_name_adata_to_name_adata_representative[ object_data.main.name_adata ] + ".multiplied_by_1000." + str_name_data_annotation + ".tsv.gz.base64.txt"; // retrieve the name of file for the current 'str_name_data_annotation'
                 await LoadRemoteData( [ object_data.file.base_url + name_file_box_plot_summary ] );
                 object_data.main.gene_summary = { };
                 object_data.main.gene_summary.boxplot = { };
@@ -2693,7 +2755,7 @@ var DragSort=function(t){
         }
         l_trace = l_trace.sort( SortBoxTrace );
 //         document.getElementById( "plotly_searchbox_main_preview" ).style.height = "350px";
-        Plotly.newPlot( "plotly_searchbox_main_preview", l_trace, { margin: { l: 65, r: 65, b: 90, t: 50, pad: 4 }, yaxis: { title : "Relative Expression of " + gene_symbol } }, { filename: name_application + '__Preview_Expression_of_' + gene_symbol, height: preview_height, width: preview_width, ... config_plotly } ); // draw boxplot of expression of the gene 
+        Plotly.newPlot( "plotly_searchbox_main_preview", l_trace, { margin: { l: 30, r: 10, b: 70, t: 0, pad: 4 }, yaxis: { title : gene_symbol } }, { filename: name_application + '__Preview_Expression_of_' + gene_symbol, height: preview_height, width: preview_width, ... config_plotly } ); // draw boxplot of expression of the gene  // "Relative Expression of <br>" +
     }
     function Toggle_Sidebar( ) {
         // toggle side menu
