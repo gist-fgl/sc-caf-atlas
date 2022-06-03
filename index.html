@@ -2236,6 +2236,7 @@ var DragSort=function(t){
             l_expr = object_data.main.gene.expr.data[ gene_symbol ].data,
             argsort_l_expr = argsort( l_expr ), // retrieve argsort for l_expr data
             col_name_cell_type = 'cell_type';
+        object_data.main.umap.argsort_l_expr = argsort_l_expr; // update argsort for sorting values according the expression values of the cells
         if ( ! object_data.main.umap.flag_all_cells_are_used ) {
             l_expr = ArrayBooleanIndexing( l_expr, object_data.main.umap.l_bool_index_tissue );
             col_name_cell_type = 'tissue_cell_type';
@@ -2331,7 +2332,7 @@ var DragSort=function(t){
                 PlotlySynchronizedLayout( ed, l_div_plotly );
             });
             plotSingleCellExpression.on( 'plotly_click', async function( data ) {
-                PlotlyCallBackSingleCellMarker( data.points[ 0 ] ); // open single cell marker for the first data
+                PlotlyCallBackSingleCellMarker( data.points[ 0 ], object_data.main.umap.argsort_l_expr ); // open single cell marker for the first data // indicates that the data has been sorted
             });
             if ( flag_sync ) {
                 // relayout the plot and sync the plot to that of 'plotSingleCellExpression' graph
@@ -2592,9 +2593,12 @@ var DragSort=function(t){
         }
     }
     dict_name_adata_to_name_col_for_cluster = { 'all' : 'name_cluster', 'data_SF1G' : 'seurat_clusters', 'data_SF3A' : 'cell_anno_subclustering', 'data_F5D' : 'state', 'data_F4D' : 'state', 'data_F2F' : 'state_detailed' }; // column name used for marker gene detection
-    async function PlotlyCallBackSingleCellMarker( clicked_point ) { // load the cell-type marker gene table of the cell-type to which the clicked cell belongs
+    async function PlotlyCallBackSingleCellMarker( clicked_point, l_argsort = null ) { // load the cell-type marker gene table of the cell-type to which the clicked cell belongs // use 'l_argsort', used in the sorting, to find an index (integer representation) of the clicked cell before sorting
 //         console.log( clicked_point );
         let index_point = clicked_point.pointIndex, dictarr = object_data.main.umap.dictarr;
+        if ( ! ( l_argsort === null ) ) {
+            index_point = l_argsort[ index_point ]; // use 'l_argsort', used in the sorting, to find an index (integer representation) of the clicked cell before sorting
+        }
         let str_name_cluster = dictarr[ dict_name_adata_to_name_col_for_cluster[ object_data.main.name_adata_representative ] ][ index_point ], str_key = str_name_cluster;
         let object_cache = object_data.main.cell_marker;
         await UpdateCache( object_cache, null, [ str_key ] ); // update cache of cell marker data
